@@ -3,14 +3,15 @@
 ## 1. Resumen
 
 *Red Bajo Ataque* es un videojuego web educativo para un curso introductorio de
-**Redes**. Enseña conceptos de redes y seguridad a través de **tres retos**. Cada reto
+**Redes**. Enseña conceptos de redes y seguridad a través de **cuatro retos**. Cada reto
 muestra una **solución comentada** al terminar, para que el jugador aprenda aun cuando
 falle. El juego es una página HTML local que se abre directamente en el navegador
 (no requiere servidor).
 
 **Objetivo pedagógico:** al terminar, el jugador sabe (1) identificar un cable
-defectuoso en distintas topologías, (2) qué piezas componen distintos tipos de red, y
-(3) identificar un componente malicioso/no autorizado en una red.
+defectuoso en distintas topologías, (2) qué piezas componen distintos tipos de red,
+(3) identificar un componente malicioso/no autorizado en una red, y (4) reconocer
+correos de phishing por sus indicadores.
 
 ## 2. Decisiones técnicas (fijas)
 
@@ -37,10 +38,12 @@ red_bajo_ataque/
 │   └── challenges/
 │       ├── cable_perdido.js
 │       ├── la_intrusa.js
-│       └── identifica_red.js
+│       ├── identifica_red.js
+│       └── anti_phishing.js
 ├── src/                    # assets SVG (existente; se llenará después)
 └── memory/
-    └── scoreboard.txt      # semilla JSON (existente)
+    ├── scoreboard.txt      # semilla JSON del scoreboard (existente)
+    └── emails.txt          # datos del reto Anti-phishing (JSON, solo lectura)
 ```
 
 > Nota: la implementación del juego es una **tarea futura**. Este documento y sus
@@ -58,7 +61,7 @@ red_bajo_ataque/
         ┌───────┴────────┐
         ▼                ▼
 ┌──────────────┐   ┌──────────────────────────┐
-│  memory.js   │   │  timer.js (cronómetro)    │
+│  memory.js   │   │  timer.js (cronómetro)   │
 │  puntaje +   │   └──────────┬───────────────┘
 │  scoreboard  │              │
 │ → memory.md  │              │
@@ -66,12 +69,13 @@ red_bajo_ataque/
        │ habilita puntaje     │
        └──────────┬───────────┘
                   ▼
-   ┌──────────────────────────────────────┐
-   │  Retos (independientes entre sí):     │
-   │  • cable_perdido  → cable_perdido_challenge.md
-   │  • la_intrusa     → la_intrusa_challenge.md
-   │  • identifica_red → identifica_red_challenge.md
-   └───────────────────┬──────────────────┘
+   ┌────────────────────────────────────────────────┐
+   │  Retos (independientes entre sí):              │
+   │  • cable_perdido  → cable_perdido_challenge.md │
+   │  • la_intrusa     → la_intrusa_challenge.md    │
+   │  • identifica_red → identifica_red_challenge.md│
+   │  • anti_phishing  → anti_phishing_challenge.md │
+   └───────────────────┬────────────────────────────┘
                        ▼
             ┌────────────────────┐
             │ vista Scoreboard + │
@@ -93,6 +97,7 @@ red_bajo_ataque/
 - [`cable_perdido_challenge.md`](./cable_perdido_challenge.md) — reto "El cable perdido".
 - [`la_intrusa_challenge.md`](./la_intrusa_challenge.md) — reto "La intrusa".
 - [`identifica_red_challenge.md`](./identifica_red_challenge.md) — reto "Identifica la red".
+- [`anti_phishing_challenge.md`](./anti_phishing_challenge.md) — reto "Anti-phishing".
 
 ## 6. Lista de hitos (checklist de implementación futura)
 
@@ -102,8 +107,9 @@ red_bajo_ataque/
 - [ ] **M3 — Reto 1:** El cable perdido.
 - [ ] **M4 — Reto 2:** La intrusa.
 - [ ] **M5 — Reto 3:** Identifica la red.
-- [ ] **M6 — Scoreboard + Export:** tabla ordenada por Score y botón Exportar.
-- [ ] **M7 — Pulido:** integrar assets de `/src`, estilos, accesibilidad básica.
+- [ ] **M6 — Reto 4:** Anti-phishing.
+- [ ] **M7 — Scoreboard + Export:** tabla ordenada por Score y botón Exportar.
+- [ ] **M8 — Pulido:** integrar assets de `/src`, estilos, accesibilidad básica.
 
 ## 7. Mapa de contenidos (tema de redes por reto)
 
@@ -112,3 +118,66 @@ red_bajo_ataque/
 | El cable perdido | Medios de transmisión (UTP/STP, coaxial, fibra, inalámbrico), topologías (bus, estrella, anillo, malla), fallos de cableado. |
 | La intrusa | Dispositivos de red (router, switch, AP, firewall) vs. dispositivo no autorizado; conceptos básicos de seguridad (rogue AP, MAC no autorizada). |
 | Identifica la red | Clasificación de redes (PAN/LAN/MAN/WAN/WLAN) y reconocimiento de topología a partir de componentes. |
+| Anti-phishing | Ingeniería social y seguridad de correo: indicadores de phishing (dominio/remitente falso, urgencia, URLs engañosas, adjuntos, solicitud de credenciales). |
+
+## 8. Seguimiento / Pendientes
+
+Tareas abiertas antes y durante la construcción del juego.
+
+| # | Pendiente | Estado | Notas |
+|---|-----------|--------|-------|
+| P1 | **Poblar `/src/`** con los SVG de la lista de abajo. | ⏳ pendiente | Bloquea el pulido visual (M8); los retos pueden construirse con placeholders. |
+| P2 | Integrar los assets reales en cada reto (reemplazar placeholders). | ⏳ pendiente | Depende de P1. |
+| P3 | Construir el juego (shell + memory + 4 retos + scoreboard). | ⏳ pendiente | Ver hitos M1–M8. |
+| P4 | **Poblar `memory/emails.txt`** con los correos del reto Anti-phishing (JSON). | ⏳ pendiente | Fuente de datos del reto; ver `anti_phishing_challenge.md`. |
+| P5 | Entregables no-juego (manual del facilitador, video, PDF, métricas). | ⏳ pendiente | Fuera del alcance del código. |
+
+### 8.1 Recursos `/src/` requeridos
+
+Lista consolidada de los assets que necesito crear/colocar en `/src/`. Nombres en
+**snake_case de 1 a 3 palabras** (sin extensión; serán `.svg`). Cada reto los referencia
+como placeholders hasta que existan.
+
+**Topologías y escenarios (diagramas):**
+- `topologia_estrella`
+- `topologia_bus`
+- `topologia_anillo`
+- `topologia_malla`
+- `diagrama_red`
+- `escenario_oficina`
+- `escenario_wan`
+- `escenario_pan`
+
+**Dispositivos:**
+- `router`
+- `switch`
+- `firewall`
+- `access_point`
+- `pc`
+- `laptop`
+- `servidor`
+- `impresora`
+- `bluetooth`
+- `ciudad`
+- `dispositivo_intruso`
+
+**Cables y estados:**
+- `cable_ok`
+- `cable_falla`
+- `nodo_sin_red`
+
+**Anti-phishing:**
+- `correo`
+- `correo_phishing`
+- `correo_seguro`
+- `anzuelo`
+- `alerta`
+
+**UI común / marcadores:**
+- `marca_correcto`
+- `marca_incorrecto`
+- `check_completado`
+- `icono_usuario`
+- `icono_reloj`
+- `icono_exportar`
+- `logo_juego`

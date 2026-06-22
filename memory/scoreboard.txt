@@ -1,11 +1,12 @@
 [
     {
-        name: "Rick",
-        score: 1000,
-        time: 90
-    },{
-        name: "Arturo",
-        score: 900,
-        time: 95
+        "name": "Rick",
+        "score": 240,
+        "time": 90
     },
+    {
+        "name": "Arturo",
+        "score": 200,
+        "time": 95
+    }
 ]

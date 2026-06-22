@@ -60,7 +60,7 @@ const IDENTIFICA_RED_ROUNDS = [
 ## 5. Assets requeridos (`/src`, placeholders)
 
 - `escenario_oficina.svg`, `escenario_wan.svg`, `escenario_pan.svg`.
-- Íconos de componentes: `router.svg`, `switch.svg`, `ap.svg`, `laptop.svg`,
+- Íconos de componentes: `router.svg`, `switch.svg`, `access_point.svg`, `laptop.svg`,
   `servidor.svg`, `pc.svg`, `bluetooth.svg`, `ciudad.svg`.
 - Botones/opciones de selección (HTML, no necesariamente SVG).
 

@@ -10,6 +10,10 @@ compartido. Implementación objetivo: `js/memory.js`. Ver también
   el mismo navegador).
 - **Semilla:** `memory/scoreboard.txt` se lee **una sola vez** (en el primer arranque,
   cuando el scoreboard de localStorage está vacío) para precargar entradas históricas.
+- **Contenido de reto:** `memory/emails.txt` es la **fuente de datos de solo lectura**
+  del reto Anti-phishing: un banco de **≥14 correos** (≥7 legítimos y ≥7 sospechosos) en
+  JSON estricto. Se carga con `fetch` al iniciar el reto, que muestra **5 al azar** (≥2
+  legítimos garantizados); ver `anti_phishing_challenge.md`.
 - **Export:** botón **"Exportar scoreboard.txt"** descarga el scoreboard actual como
   JSON estricto (para recolectar métricas de la sesión de prueba).
 
@@ -30,7 +34,8 @@ compartido. Implementación objetivo: `js/memory.js`. Ver también
     challenges: {
       cable_perdido:  { score: 80, time: 42 },   // mejor score y SU tiempo
       la_intrusa:     { score: 100, time: 18 },
-      identifica_red: { score: 60, time: 70 }
+      identifica_red: { score: 60, time: 70 },
+      anti_phishing:  { score: 80, time: 35 }
     }
   }
 }
@@ -60,7 +65,7 @@ if (!prev || result.score > prev.score) {
 
 ## 3. Motor de puntaje (compartido)
 
-Función única usada por los tres retos:
+Función única usada por los cuatro retos:
 
 ```js
 function calcularPuntaje(mistakes, seconds) {
@@ -96,24 +101,38 @@ function calcularPuntaje(mistakes, seconds) {
 2. Se guarda en `rba_current_player` y se recuerda durante la sesión.
 3. Si el nombre ya existe en `rba_players`, se continúan acumulando sus mejores scores.
 
-## 6. Compatibilidad con la semilla
+## 6. Archivos en `/memory` (formato)
 
-`memory/scoreboard.txt` actualmente **no es JSON estricto** (claves sin comillas, coma
-final):
+Todos los archivos de `/memory` son **JSON estricto** (claves entre comillas, sin coma
+final) y se cargan con `fetch` + `JSON.parse`.
 
+**`memory/scoreboard.txt`** — semilla del scoreboard:
+
+```json
+[
+    { "name": "Rick",   "score": 240, "time": 90 },
+    { "name": "Arturo", "score": 200, "time": 95 }
+]
 ```
-[ { name: "Rick", score: 1000, time: 90 }, { name: "Arturo", score: 900, time: 95 }, ]
+
+**`memory/emails.txt`** — fuente de datos (solo lectura) del reto Anti-phishing; lista de
+correos a clasificar (esquema completo en `anti_phishing_challenge.md`):
+
+```json
+[
+    { "id": "phish-banco", "remitente": "...", "asunto": "...", "cuerpo": "...",
+      "esPhishing": true, "indicadores": ["..."], "solucion": "..." }
+]
 ```
 
-- El cargador debe **normalizar/tolerar** este formato al sembrar (p. ej. parser
-  permisivo o sanitizado controlado de la cadena conocida).
-- El **export** siempre escribe **JSON estricto** (claves entre comillas, sin coma final)
-  para que el archivo resultante sea reutilizable.
+- El cargador parsea ambos directamente con `JSON.parse(...)`.
+- El **export** escribe `scoreboard.txt` en el mismo formato (JSON estricto) para que sea
+  reutilizable como semilla. `emails.txt` no se exporta (es contenido de solo lectura).
 
 ## 7. Pasos de implementación (memory.js)
 
 1. `cargarScoreboard()` — lee `rba_scoreboard`; si vacío, hace `fetch` de
-   `memory/scoreboard.txt`, normaliza y siembra.
+   `memory/scoreboard.txt`, lo parsea con `JSON.parse` y siembra.
 2. `calcularPuntaje(mistakes, seconds)` — motor anterior.
 3. `registrarIntento(name, challenge, mistakes, seconds)` — calcula score, aplica regla
    de mejor intento en `rba_players`, recalcula total, upsert en `rba_scoreboard`.

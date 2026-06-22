@@ -45,7 +45,7 @@ const LA_INTRUSA_ROUNDS = [
   {
     id: "rogue-ap-1",
     enunciado: "Esta red corporativa tiene un equipo que no debería estar. ¿Cuál es?",
-    asset: "src/diagrama_red_oficina.svg",        // placeholder
+    asset: "src/diagrama_red.svg",                // placeholder
     dispositivos: [
       { id: "router", tipo: "router",   intruso: false },
       { id: "sw1",    tipo: "switch",   intruso: false },
@@ -63,8 +63,8 @@ const LA_INTRUSA_ROUNDS = [
 
 ## 5. Assets requeridos (`/src`, placeholders)
 
-- `router.svg`, `switch.svg`, `firewall.svg`, `ap.svg`, `pc.svg`, `servidor.svg`,
-  `impresora.svg`, `dispositivo_intruso.svg`.
+- `router.svg`, `switch.svg`, `firewall.svg`, `access_point.svg`, `pc.svg`,
+  `servidor.svg`, `impresora.svg`, `dispositivo_intruso.svg`.
 - Marcadores: `marca_correcto.svg`, `marca_incorrecto.svg`.
 - Cada dispositivo es clicable con `data-id`.
 

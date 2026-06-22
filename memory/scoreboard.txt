@@ -1,0 +1,11 @@
+[
+    {
+        name: "Rick",
+        score: 1000,
+        time: 90
+    },{
+        name: "Arturo",
+        score: 900,
+        time: 95
+    },
+]

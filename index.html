@@ -19,7 +19,10 @@
   </div>
 
   <header class="app-header">
-    <span class="app-title">Red Bajo Ataque</span>
+    <div class="app-title-group">
+      <span class="app-title">Red Bajo Ataque</span>
+      <button id="btn-docs" class="btn-docs" title="Documentación">📚 Docs</button>
+    </div>
     <span class="app-player">
       👤 <span id="display-nombre"></span>
       <button id="btn-nuevo-jugador" class="btn-switch-player" title="Cambiar jugador">✎</button>
@@ -90,6 +93,594 @@
         <tbody id="cuerpo-scoreboard"></tbody>
       </table>
     </section>
+
+    <!-- Documentación -->
+    <section id="sec-docs" class="hidden">
+      <div class="docs-header">
+        <h2>📚 Documentación</h2>
+        <div class="doc-subnav">
+          <button class="doc-tab active" data-panel="manual">Manual del Facilitador</button>
+          <button class="doc-tab" data-panel="spec">Especificación Técnica</button>
+        </div>
+      </div>
+
+      <!-- ===================== MANUAL DEL FACILITADOR ===================== -->
+      <div id="doc-panel-manual" class="doc-panel">
+
+        <details class="doc-section">
+          <summary>1. Descripción general</summary>
+          <div class="doc-section-body">
+            <p><strong>Red Bajo Ataque</strong> es un videojuego educativo web sobre redes y ciberseguridad. Se ejecuta íntegramente en el navegador sin instalación de dependencias — basta abrir <code>index.html</code>.</p>
+            <p>El juego incluye cuatro retos progresivos que cubren topologías de red, dispositivos no autorizados, clasificación de redes y phishing por correo electrónico. Al superar cada reto el jugador recibe retroalimentación inmediata y una explicación técnica de la solución.</p>
+            <div class="challenge-brief">
+              <h4>Ficha de la actividad</h4>
+              <div class="cb-row">
+                <div class="cb-block">
+                  <div class="cb-label">Público objetivo</div>
+                  <ul>
+                    <li>Estudiantes de cursos de redes (básico / intermedio)</li>
+                    <li>Personal corporativo en capacitación de seguridad</li>
+                    <li>Equipos de TI que ingresan a roles de soporte o helpdesk</li>
+                  </ul>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Tiempo estimado</div>
+                  <ul>
+                    <li><strong>Individual sin guía:</strong> 30–60 min</li>
+                    <li><strong>Grupal con discusión:</strong> 90–120 min</li>
+                    <li><strong>Demo proyectada:</strong> 45–60 min</li>
+                  </ul>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Prerequisitos</div>
+                  <ul>
+                    <li>Ninguno técnico para completar los retos</li>
+                    <li>Conocimiento básico de redes ayuda en la discusión posterior</li>
+                    <li>Navegador moderno (Chrome 90+, Firefox 88+, Edge 90+)</li>
+                  </ul>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Materiales necesarios</div>
+                  <ul>
+                    <li>Computadora por participante (o una compartida por equipo)</li>
+                    <li>Proyector o pantalla compartida para modo demo</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="doc-section">
+          <summary>2. Puesta en marcha</summary>
+          <div class="doc-section-body">
+            <p>Abrir el archivo <code>index.html</code> directamente en el navegador. El scoreboard se guarda localmente en el navegador.</p>
+            <div class="callout warn"><strong>Nota:</strong> Limpiar el caché del navegador borra el historial de puntajes.</div>
+            <h4>Para salón de clases o capacitación corporativa</h4>
+            <ul>
+              <li>Asignar un <strong>nickname único por equipo</strong> al inicio (por ejemplo el nombre del equipo o número de mesa).</li>
+              <li>Proyectar el Scoreboard al final para comparar resultados grupalmente.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="doc-section">
+          <summary>3. Guía reto a reto</summary>
+          <div class="doc-section-body">
+
+            <div class="challenge-brief">
+              <h4>🔌 Reto 1 — El cable perdido (Topologías de red)</h4>
+              <div class="cb-row">
+                <div class="cb-block">
+                  <div class="cb-label">Objetivo de aprendizaje</div>
+                  <p>Diagnosticar fallas de conectividad según la topología de red. El jugador identifica cuál cable o enlace está roto observando qué equipos pierden conectividad (estrella y bus) o analizando el recorrido de paquetes (anillo y malla).</p>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Conceptos clave</div>
+                  <ul>
+                    <li><strong>Estrella:</strong> SPOF en el switch; cable de un solo equipo afectado</li>
+                    <li><strong>Bus:</strong> corte divide el bus en dos segmentos; equipos del lado derecho quedan sin red</li>
+                    <li><strong>Anillo:</strong> el tráfico redirige en sentido contrario alrededor del anillo roto</li>
+                    <li><strong>Malla:</strong> redundancia total; el paquete usa ruta alternativa</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="cb-row" style="margin-top:12px">
+                <div class="cb-block">
+                  <div class="cb-label">Preguntas de discusión</div>
+                  <ol>
+                    <li>¿Por qué en topología estrella solo un equipo pierde red cuando se rompe un cable?</li>
+                    <li>¿Qué topología ofrece mayor tolerancia a fallos y cuál es su desventaja principal?</li>
+                    <li>¿Cuándo tendría sentido usar topología bus hoy en día?</li>
+                  </ol>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Error común a señalar</div>
+                  <div class="callout alert"><strong>Bus real vs. simplificación del juego:</strong> En cable coaxial real, una ruptura genera reflexiones de señal que colapsan TODA la red, no solo el segmento derecho. El juego simplifica esto para hacer el diagnóstico más intuitivo y pedagógico.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="challenge-brief">
+              <h4>🔍 Reto 2 — La intrusa (Dispositivos no autorizados)</h4>
+              <div class="cb-row">
+                <div class="cb-block">
+                  <div class="cb-label">Objetivo de aprendizaje</div>
+                  <p>Identificar dispositivos no autorizados analizando su posición en la arquitectura de red, sus credenciales y el contexto del diagrama. No basta reconocer el tipo de dispositivo; importa <em>dónde</em> está conectado.</p>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Conceptos clave</div>
+                  <ul>
+                    <li><strong>Rogue AP:</strong> punto de acceso no autorizado dentro del segmento interno</li>
+                    <li><strong>Bypass de firewall:</strong> equipo conectado antes del perímetro de seguridad</li>
+                    <li><strong>Inventario de activos:</strong> comparar lo detectado vs. lo registrado (IP + MAC)</li>
+                    <li><strong>Posición en la red:</strong> la misma laptop puede ser legítima o intrusiva según su ubicación</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="cb-row" style="margin-top:12px">
+                <div class="cb-block">
+                  <div class="cb-label">Preguntas de discusión</div>
+                  <ol>
+                    <li>¿Qué daño concreto puede causar un AP conectado al switch interno sin pasar por el firewall?</li>
+                    <li>¿Cómo evitarías físicamente que alguien conecte un dispositivo no autorizado a un puerto del switch?</li>
+                    <li>¿Qué es IEEE 802.1X y cómo resolvería este problema?</li>
+                  </ol>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Error común a señalar</div>
+                  <div class="callout warn"><strong>Ignorar la posición en el diagrama:</strong> Muchos participantes solo buscan el dispositivo "más raro" visualmente. Recordarles que deben analizar la topología: un equipo legítimo conectado en el lugar incorrecto es igualmente peligroso.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="challenge-brief">
+              <h4>🌐 Reto 3 — Identifica la red (Tipos de red)</h4>
+              <div class="cb-row">
+                <div class="cb-block">
+                  <div class="cb-label">Objetivo de aprendizaje</div>
+                  <p>Clasificar correctamente una red por su alcance geográfico (PAN / LAN / WLAN / MAN / WAN) y su topología física (estrella, bus, anillo, malla) a partir de los componentes y descripciones presentados.</p>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Conceptos clave</div>
+                  <ul>
+                    <li><strong>PAN:</strong> área personal, &lt;10 m, Bluetooth / Zigbee</li>
+                    <li><strong>LAN:</strong> red local, &lt;1 km, Ethernet</li>
+                    <li><strong>WLAN:</strong> LAN inalámbrica, misma escala que LAN pero sin cable</li>
+                    <li><strong>MAN:</strong> red metropolitana, ciudad/campus multi-edificio</li>
+                    <li><strong>WAN:</strong> red amplia, global, Internet</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="cb-row" style="margin-top:12px">
+                <div class="cb-block">
+                  <div class="cb-label">Preguntas de discusión</div>
+                  <ol>
+                    <li>¿Cuál es la diferencia práctica entre una LAN y una WLAN? ¿Pueden coexistir?</li>
+                    <li>¿Una red de oficina con puntos de acceso Wi-Fi es LAN, WLAN o ambas?</li>
+                    <li>¿Qué tecnología conecta los diferentes edificios de una universidad en una MAN?</li>
+                  </ol>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Error común a señalar</div>
+                  <div class="callout warn"><strong>WLAN ≠ WAN:</strong> La "W" de ambas confunde a muchos. WLAN es una LAN inalámbrica (escala local); WAN es una red de área amplia (escala geográfica). El medio de transmisión (cable vs. radio) no determina la escala.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="challenge-brief">
+              <h4>🎣 Reto 4 — Anti-phishing (Ingeniería social por correo)</h4>
+              <div class="cb-row">
+                <div class="cb-block">
+                  <div class="cb-label">Objetivo de aprendizaje</div>
+                  <p>Distinguir correos legítimos de phishing utilizando indicadores técnicos (dominio del remitente, enlaces, adjuntos) y contextuales (urgencia artificial, amenazas, solicitudes inusuales). Se procesan 5 correos por partida seleccionados aleatoriamente de un banco de 14.</p>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Conceptos clave</div>
+                  <ul>
+                    <li><strong>Spoofing de remitente:</strong> el nombre visible no es la dirección real</li>
+                    <li><strong>Typosquatting:</strong> dominios similares al legítimo (paypa1.com)</li>
+                    <li><strong>Urgencia artificial:</strong> presión para actuar sin pensar</li>
+                    <li><strong>SPF / DKIM / DMARC:</strong> mecanismos de autenticación de correo</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="cb-row" style="margin-top:12px">
+                <div class="cb-block">
+                  <div class="cb-label">Preguntas de discusión</div>
+                  <ol>
+                    <li>¿Qué elementos del correo falso generaron más sospecha? ¿Cuáles fueron los más difíciles de detectar?</li>
+                    <li>¿Cambiaría tu respuesta si el correo pareciera venir de tu jefe directo?</li>
+                    <li>¿Qué hacen SPF, DKIM y DMARC, y por qué no son suficientes por sí solos para detener el phishing?</li>
+                  </ol>
+                </div>
+                <div class="cb-block">
+                  <div class="cb-label">Error común a señalar</div>
+                  <div class="callout alert"><strong>Confiar en el nombre visible del remitente:</strong> El campo "De:" puede mostrar cualquier nombre. La dirección real entre paréntesis o corchetes es lo que importa. Señalar en los resultados la diferencia entre nombre visible y dominio real.</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </details>
+
+        <details class="doc-section">
+          <summary>4. Modos de facilitación</summary>
+          <div class="doc-section-body">
+            <table class="doc-table">
+              <thead>
+                <tr><th>Modo</th><th>Descripción</th><th>Ideal para</th><th>Duración aprox.</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Individual competitivo</strong></td>
+                  <td>Cada participante juega en su equipo. Al terminar, comparan resultados en el Scoreboard proyectado.</td>
+                  <td>Grupos de 10–30 personas con equipos propios</td>
+                  <td>45–60 min</td>
+                </tr>
+                <tr>
+                  <td><strong>Equipos colaborativos</strong></td>
+                  <td>Grupos de 2–3 personas discuten cada elección antes de hacer clic. Un solo nickname por equipo.</td>
+                  <td>Capacitaciones con foco en discusión grupal</td>
+                  <td>60–90 min</td>
+                </tr>
+                <tr>
+                  <td><strong>Demostración guiada</strong></td>
+                  <td>El facilitador proyecta el juego. El grupo decide en voz alta qué seleccionar antes de cada clic.</td>
+                  <td>Grupos grandes (30+) o cuando hay un solo equipo</td>
+                  <td>45–60 min</td>
+                </tr>
+                <tr>
+                  <td><strong>Flipped (invertido)</strong></td>
+                  <td>Los participantes juegan primero de forma individual. Luego el facilitador repasa cada solución usando la pantalla de resultados como punto de partida.</td>
+                  <td>Talleres con tiempo para análisis posterior</td>
+                  <td>90–120 min</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="doc-section">
+          <summary>5. Sistema de puntuación</summary>
+          <div class="doc-section-body">
+            <p>Cada reto otorga hasta <strong>100 puntos</strong> (400 puntos totales en los 4 retos). El sistema guarda únicamente el <em>mejor intento</em> de cada jugador por reto.</p>
+            <table class="doc-table">
+              <thead>
+                <tr><th>Componente</th><th>Regla</th><th>Máximo impacto</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Puntaje base</td><td>100 puntos al iniciar cada reto</td><td>100 pts</td></tr>
+                <tr><td>Penalización por error</td><td>−20 puntos por cada selección incorrecta</td><td>Sin límite (mínimo 0)</td></tr>
+                <tr><td>Penalización por tiempo</td><td>Los primeros 25 s no penalizan. A partir de ahí, −10 pts cada 10 s adicionales.</td><td>−50 pts (piso en 0)</td></tr>
+                <tr><td>Puntaje mínimo</td><td>El puntaje nunca baja de 0</td><td>0 pts</td></tr>
+                <tr><td>Total máximo</td><td>4 retos × 100 pts</td><td>400 pts</td></tr>
+              </tbody>
+            </table>
+            <div class="callout tip"><strong>Para el facilitador:</strong> Los puntajes altos requieren velocidad Y precisión. Un participante que comete muchos errores pero es rápido puede puntuar menos que uno lento y cuidadoso. Esto incentiva la reflexión antes de hacer clic.</div>
+          </div>
+        </details>
+
+        <details class="doc-section">
+          <summary>6. Personalización</summary>
+          <div class="doc-section-body">
+            <h4>Agregar correos de phishing / legítimos</h4>
+            <p>Editar <code>memory/emails.txt</code>. El archivo es un array JSON. Cada objeto tiene esta estructura:</p>
+            <pre style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;overflow-x:auto;font-family:var(--mono);font-size:.82rem;color:var(--accent);margin:10px 0">{
+  "id": "e15",
+  "remitente": "soporte@banco-seguro.com",
+  "asunto": "Tu cuenta ha sido suspendida",
+  "cuerpo": "Estimado cliente...",
+  "esPhishing": true,
+  "indicadores": ["Urgencia artificial", "Enlace sospechoso", "Dominio incorrecto"]
+}</pre>
+            <p>Agregar el objeto al array y asegurarse de tener al menos 7 correos legítimos y 7 de phishing para que la selección aleatoria funcione correctamente.</p>
+
+            <h4>Cambiar velocidad de animación (anillo y malla)</h4>
+            <p>En <code>js/challenges/cable_perdido.js</code>, modificar la constante <code>SEG_MS</code> (milisegundos por segmento). Valor predeterminado: <code>420</code>. Reducir para mayor dificultad, aumentar para facilitar a grupos menos experimentados.</p>
+
+            <h4>Modificar penalizaciones</h4>
+            <p>En <code>js/memory.js</code>, función <code>calcularPuntaje(mistakes, seconds)</code>. Actualmente: <code>100 - mistakes × 20 - min(50, floor(max(0, secs-25)/10) × 10)</code>. Cambiar los coeficientes según el nivel de exigencia deseado.</p>
+          </div>
+        </details>
+
+      </div><!-- /doc-panel-manual -->
+
+      <!-- ===================== ESPECIFICACIÓN TÉCNICA ===================== -->
+      <div id="doc-panel-spec" class="doc-panel hidden">
+
+        <details class="doc-section">
+          <summary>Reto 1: Topologías de Red</summary>
+          <div class="doc-section-body">
+
+            <h4>Topología Estrella — Fundamentos</h4>
+            <p>En una topología estrella todos los dispositivos se conectan a un nodo central. En redes modernas ese nodo es un <strong>switch</strong> (no un hub). La diferencia es fundamental:</p>
+            <table class="doc-table">
+              <thead><tr><th>Característica</th><th>Hub (capa 1)</th><th>Switch (capa 2)</th></tr></thead>
+              <tbody>
+                <tr><td>Envío de frames</td><td>Broadcast a todos los puertos</td><td>Unicast al puerto destino (tabla CAM)</td></tr>
+                <tr><td>Dominio de colisión</td><td>Único para todos los puertos</td><td>Un dominio por puerto</td></tr>
+                <tr><td>Modo de operación</td><td>Half-duplex obligatorio</td><td>Full-duplex disponible</td></tr>
+                <tr><td>CSMA/CD</td><td>Necesario</td><td>Innecesario en full-duplex</td></tr>
+                <tr><td>Ancho de banda</td><td>Compartido</td><td>Dedicado por puerto</td></tr>
+              </tbody>
+            </table>
+            <p>El estándar <code>IEEE 802.3</code> (Ethernet) define CSMA/CD para half-duplex: cada nodo <em>escucha</em> antes de transmitir (Carrier Sense), detecta colisiones (Collision Detect) y espera un tiempo aleatorio con backoff exponencial binario antes de reintentar. En full-duplex con switch, no hay colisiones y CSMA/CD no se usa.</p>
+            <p>El <strong>Single Point of Failure (SPOF)</strong> del switch se mitiga con STP (<code>IEEE 802.1D</code>) que bloquea puertos redundantes para evitar loops, y RSTP (<code>IEEE 802.1w</code>) que reduce el tiempo de convergencia a menos de 1 segundo tras una falla.</p>
+            <table class="doc-table">
+              <thead><tr><th>Estándar</th><th>Velocidad</th><th>Cable</th><th>Distancia máx.</th></tr></thead>
+              <tbody>
+                <tr><td><code>10BASE-T</code></td><td>10 Mbps</td><td>Cat 3 UTP</td><td>100 m</td></tr>
+                <tr><td><code>100BASE-TX</code></td><td>100 Mbps</td><td>Cat 5 UTP</td><td>100 m</td></tr>
+                <tr><td><code>1000BASE-T</code></td><td>1 Gbps</td><td>Cat 5e / 6</td><td>100 m</td></tr>
+                <tr><td><code>10GBASE-T</code></td><td>10 Gbps</td><td>Cat 6a / 7</td><td>100 m</td></tr>
+                <tr><td><code>25GBASE-T</code></td><td>25 Gbps</td><td>Cat 8</td><td>30 m</td></tr>
+              </tbody>
+            </table>
+
+            <h4>Topología Bus — Cable Coaxial y CSMA/CD</h4>
+            <p>En la topología bus todos los nodos comparten un único medio de transmisión. Las dos variantes históricas de Ethernet coaxial son:</p>
+            <table class="doc-table">
+              <thead><tr><th>Estándar</th><th>Cable</th><th>Longitud máx.</th><th>Nodos máx.</th><th>Velocidad</th></tr></thead>
+              <tbody>
+                <tr><td><code>10BASE2</code> ("Thinnet")</td><td>RG-58 (coaxial fino)</td><td>185 m</td><td>30</td><td>10 Mbps</td></tr>
+                <tr><td><code>10BASE5</code> ("Thicknet")</td><td>RG-8 (coaxial grueso)</td><td>500 m</td><td>100</td><td>10 Mbps</td></tr>
+              </tbody>
+            </table>
+            <p>Los <strong>terminadores de 50 Ω</strong> en ambos extremos absorben la señal al final del cable. Sin ellos, la señal se refleja de vuelta y produce ondas estacionarias que corrompen toda transmisión. Una ruptura física elimina la terminación en uno de los extremos, colapsando toda la red — no solo el segmento afectado. El juego simplifica este comportamiento mostrando solo los equipos del lado derecho del corte como desconectados, para que el diagnóstico sea didácticamente claro.</p>
+            <div class="callout"><strong>Estado actual:</strong> La topología bus en Ethernet coaxial es obsoleta. Ninguna red de producción la usa hoy. Su valor es exclusivamente pedagógico para entender la evolución histórica hacia la estrella con switch.</div>
+
+            <h4>Topología Anillo — Token Ring, FDDI y SONET</h4>
+            <p><strong>Token Ring (<code>IEEE 802.5</code>):</strong> Un token de control circula continuamente. Solo el nodo que posee el token puede transmitir, garantizando acceso determinístico sin colisiones. Velocidades: 4 Mbps y 16 Mbps. Obsoleto desde mediados de los 2000.</p>
+            <p><strong>FDDI (Fiber Distributed Data Interface):</strong> Anillo dual de fibra óptica a 100 Mbps, hasta 200 km de circunferencia y 500 nodos. El anillo secundario circula en sentido contrario al primario; ante una falla en el primario, ambos anillos se unen para formar un único bucle de recuperación.</p>
+            <p><strong>SONET/SDH:</strong> La tecnología de anillo más relevante en producción actual. Anillos de fibra óptica con protección automática:</p>
+            <ul>
+              <li><strong>UPSR</strong> (Unidirectional Path Switched Ring): el tráfico se envía por ambas direcciones simultáneamente; el receptor selecciona la mejor señal. Recuperación en &lt;50 ms.</li>
+              <li><strong>BLSR</strong> (Bidirectional Line Switched Ring): el ancho de banda no utilizado del anillo secundario está disponible normalmente; en caso de falla, el tráfico conmuta en &lt;50 ms.</li>
+            </ul>
+            <p>El juego modela un <strong>anillo bidireccional simplificado</strong>: ante un enlace roto, el algoritmo BFS encuentra la ruta alternativa en sentido contrario y anima el paquete sobre ella.</p>
+
+            <h4>Topología Malla — Redundancia y Enrutamiento</h4>
+            <p>En una malla completa (<em>full mesh</em>) de N nodos, el número de enlaces es <strong>N×(N−1)/2</strong>: para 4 nodos son 6 enlaces, para 10 nodos son 45. La malla parcial (<em>partial mesh</em>) reduce costos manteniendo redundancia en los puntos críticos.</p>
+            <p>Los protocolos de enrutamiento que operan sobre topologías de malla son:</p>
+            <ul>
+              <li><strong>OSPF (<code>RFC 2328</code>)</strong>: protocolo de estado de enlace (link-state). Cada router construye un mapa completo de la topología mediante LSAs (Link State Advertisements) e inunda la red con ellos. Usa el algoritmo de Dijkstra para calcular la ruta de menor costo. Convergencia rápida (&lt;1 s con ajustes de temporizadores).</li>
+              <li><strong>BGP (<code>RFC 4271</code>)</strong>: protocolo de vector de trayecto (path-vector). Enruta entre Sistemas Autónomos (AS) en Internet. Selecciona rutas basado en políticas (preferencia local, AS-path, MED) más que solo distancia. Es el protocolo de enrutamiento del Internet.</li>
+            </ul>
+            <p>El juego implementa <strong>BFS (Breadth-First Search)</strong> sobre el grafo de enlaces activos para encontrar la ruta más corta en número de saltos, simulando el principio de enrutamiento dinámico alrededor del enlace roto.</p>
+
+            <h4>Comparativa de topologías</h4>
+            <table class="doc-table">
+              <thead><tr><th>Topología</th><th>Tolerancia a fallos</th><th>Costo relativo</th><th>Diagnóstico</th><th>Uso actual</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Estrella</strong></td><td>Media (SPOF en switch)</td><td>Medio</td><td>Fácil</td><td>LAN empresarial, data center (ToR)</td></tr>
+                <tr><td><strong>Bus</strong></td><td>Muy baja (falla total ante ruptura)</td><td>Bajo</td><td>Difícil</td><td>Obsoleto (legacy industrial)</td></tr>
+                <tr><td><strong>Anillo</strong></td><td>Alta (bidireccional)</td><td>Medio-alto</td><td>Medio</td><td>Redes metro, transporte SONET/SDH</td></tr>
+                <tr><td><strong>Malla</strong></td><td>Muy alta</td><td>Alto (crece cuadráticamente)</td><td>Complejo</td><td>Backbone de Internet, CPD, SD-WAN</td></tr>
+              </tbody>
+            </table>
+
+          </div>
+        </details>
+
+        <details class="doc-section">
+          <summary>Reto 2: Seguridad de Dispositivos de Red</summary>
+          <div class="doc-section-body">
+
+            <h4>Rogue Access Points</h4>
+            <p>Un <strong>Rogue AP</strong> es un punto de acceso inalámbrico instalado en la red sin autorización del equipo de TI. Su peligrosidad reside en que, al conectarse al segmento interno (detrás del firewall), el tráfico que pasa por él elude todas las políticas de seguridad perimetral.</p>
+            <p>Variantes del ataque:</p>
+            <ul>
+              <li><strong>Evil Twin:</strong> el atacante configura un AP con el mismo SSID que el legítimo pero con mayor potencia de señal. Los clientes se asocian automáticamente al AP con mayor señal, entregando credenciales y tráfico al atacante.</li>
+              <li><strong>Karma Attack:</strong> el AP malicioso responde afirmativamente a cualquier <em>probe request</em> de clientes que buscan redes conocidas, haciéndose pasar por cualquier red previamente conectada.</li>
+              <li><strong>AP interno no autorizado:</strong> empleado conecta un AP al switch interno para dar Wi-Fi a un área no cubierta, sin saber que rompe el perímetro de seguridad.</li>
+            </ul>
+            <p>Métodos de detección: <strong>WIDS</strong> (Wireless Intrusion Detection Systems), monitoreo de espectro RF, correlación de tablas ARP y CAM del switch para detectar MACs inesperadas, y soluciones de controlador de APs (<code>IEEE 802.11r/k/v</code> con gestión centralizada).</p>
+            <div class="callout warn"><strong>Importante:</strong> <code>IEEE 802.11i</code> (WPA2) cifra el tráfico inalámbrico, pero no impide que un AP no autorizado se conecte físicamente al cable del switch. La seguridad inalámbrica y la seguridad de puertos son capas independientes.</div>
+
+            <h4>Control de Acceso a la Red — IEEE 802.1X</h4>
+            <p><code>IEEE 802.1X</code> define autenticación port-based: ningún tráfico de capa 2 es permitido hasta que el dispositivo se autentica. Usa EAP (Extensible Authentication Protocol) transportado sobre LAN (EAPOL).</p>
+            <table class="doc-table">
+              <thead><tr><th>Componente 802.1X</th><th>Rol</th><th>Ejemplo</th></tr></thead>
+              <tbody>
+                <tr><td>Suplicante</td><td>Dispositivo que solicita acceso</td><td>Laptop, PC, teléfono IP</td></tr>
+                <tr><td>Autenticador</td><td>Switch o AP que controla el acceso al puerto</td><td>Cisco Catalyst, Aruba AP</td></tr>
+                <tr><td>Servidor de autenticación</td><td>Valida credenciales y autoriza acceso</td><td>RADIUS (FreeRADIUS, Cisco ISE, NPS)</td></tr>
+              </tbody>
+            </table>
+            <p><strong>NAC (Network Access Control)</strong> extiende 802.1X verificando la <em>postura</em> del dispositivo: sistema operativo actualizado, antivirus activo, cifrado de disco habilitado. Solo los dispositivos que cumplen la política reciben acceso a la VLAN de producción; los que no cumplen van a una VLAN de cuarentena.</p>
+            <p><strong>MAB (MAC Authentication Bypass)</strong> permite autenticar dispositivos sin soporte 802.1X (impresoras, cámaras IP, sensores IoT) usando su dirección MAC como credencial. Es significativamente menos seguro dado que las MACs son fácilmente suplantables.</p>
+
+            <h4>Por qué MAC Filtering no es seguridad real</h4>
+            <p>El filtrado por dirección MAC es una medida de seguridad por oscuridad que falla ante cualquier atacante con conocimientos básicos:</p>
+            <ul>
+              <li>La dirección MAC se transmite en <strong>texto claro</strong> en el encabezado de cada frame Ethernet (primeros 12 bytes, visible en Wireshark sin descifrar nada).</li>
+              <li>Capturar MACs autorizadas con Wireshark toma <strong>segundos</strong> en una red activa.</li>
+              <li>MAC spoofing en Linux: <code>ip link set dev eth0 address AA:BB:CC:DD:EE:FF</code></li>
+              <li>MAC spoofing en Windows: Propiedades del adaptador → Configuración avanzada → "Locally Administered Address".</li>
+            </ul>
+            <div class="callout alert"><strong>Conclusión:</strong> MAC filtering puede disuadir a usuarios no técnicos, pero no ofrece protección real. Debe combinarse con 802.1X para tener control de acceso efectivo.</div>
+
+            <h4>Gestión de Inventario de Activos</h4>
+            <p>El <strong>CIS Control 1</strong> ("Inventario y Control de Activos de Hardware") es el primer control del CIS Top 18 por una razón: no puedes proteger lo que no sabes que existe. <strong>NIST SP 800-171</strong> también lo requiere para organizaciones que manejan información controlada no clasificada.</p>
+            <p>Herramientas de inventario y detección:</p>
+            <ul>
+              <li><strong>Nmap:</strong> <code>nmap -sn 192.168.1.0/24</code> descubre hosts activos. <code>nmap -O</code> detecta el sistema operativo.</li>
+              <li><strong>Lansweeper / Netdisco:</strong> inventario automático continuo con correlación de MACs y puertos de switch.</li>
+              <li><strong>IPAM (IP Address Management):</strong> gestión centralizada de espacio de IPs y registro de MACs autorizadas. Soluciones: Infoblox, phpIPAM, NetBox.</li>
+              <li><strong>SIEM:</strong> correlación de eventos de switch (nuevo MAC en tabla CAM) con alertas automáticas.</li>
+            </ul>
+
+          </div>
+        </details>
+
+        <details class="doc-section">
+          <summary>Reto 3: Tipos y Clasificación de Redes</summary>
+          <div class="doc-section-body">
+
+            <h4>Clasificación por alcance geográfico</h4>
+            <table class="doc-table">
+              <thead><tr><th>Tipo</th><th>Alcance</th><th>Tecnologías principales</th><th>Velocidad típica</th><th>Gestión</th><th>Ejemplo real</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>PAN</strong></td><td>&lt;10 m</td>
+                  <td><code>Bluetooth 5.x (802.15.1)</code>, <code>Zigbee (802.15.4)</code>, NFC, UWB</td>
+                  <td>2 Mbps – 480 Mbps</td><td>Personal</td><td>Audífonos inalámbricos, smartwatch</td>
+                </tr>
+                <tr>
+                  <td><strong>LAN</strong></td><td>&lt;1 km</td>
+                  <td><code>Ethernet (802.3)</code>, <code>Wi-Fi (802.11)</code></td>
+                  <td>100 Mbps – 100 Gbps</td><td>Local / Empresa</td><td>Red de oficina, laboratorio</td>
+                </tr>
+                <tr>
+                  <td><strong>WLAN</strong></td><td>&lt;300 m indoor</td>
+                  <td><code>Wi-Fi 4/5/6/6E (802.11n/ac/ax)</code></td>
+                  <td>600 Mbps – 9.6 Gbps</td><td>Local / Empresa</td><td>Red inalámbrica corporativa</td>
+                </tr>
+                <tr>
+                  <td><strong>MAN</strong></td><td>&lt;50 km</td>
+                  <td>Metro Ethernet, <code>WiMAX (802.16)</code>, fibra oscura</td>
+                  <td>1 – 100 Gbps</td><td>ISP / Municipio</td><td>Red universitaria multi-campus, red municipal</td>
+                </tr>
+                <tr>
+                  <td><strong>WAN</strong></td><td>Global</td>
+                  <td>MPLS, SD-WAN, Internet, satélite (LEO/GEO)</td>
+                  <td>Variable (Kbps–Tbps)</td><td>ISP / Carrier</td><td>Internet, redes bancarias nacionales</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h4>Evolución de los estándares Wi-Fi (IEEE 802.11)</h4>
+            <table class="doc-table">
+              <thead><tr><th>Generación</th><th>Año</th><th>Frecuencia</th><th>Velocidad máx.</th><th>Característica clave</th></tr></thead>
+              <tbody>
+                <tr><td><code>802.11b</code></td><td>1999</td><td>2.4 GHz</td><td>11 Mbps</td><td>Primera adopción masiva de Wi-Fi</td></tr>
+                <tr><td><code>802.11g</code></td><td>2003</td><td>2.4 GHz</td><td>54 Mbps</td><td>Compatible con 802.11b</td></tr>
+                <tr><td><code>802.11n</code> (Wi-Fi 4)</td><td>2009</td><td>2.4 / 5 GHz</td><td>600 Mbps</td><td>MIMO (hasta 4×4), doble banda</td></tr>
+                <tr><td><code>802.11ac</code> (Wi-Fi 5)</td><td>2013</td><td>5 GHz</td><td>3.5 Gbps</td><td>MU-MIMO, beamforming, canales 80/160 MHz</td></tr>
+                <tr><td><code>802.11ax</code> (Wi-Fi 6/6E)</td><td>2019/2021</td><td>2.4 / 5 / 6 GHz</td><td>9.6 Gbps</td><td>OFDMA, BSS Coloring, Target Wake Time (TWT)</td></tr>
+                <tr><td><code>802.11be</code> (Wi-Fi 7)</td><td>2024</td><td>2.4 / 5 / 6 GHz</td><td>46 Gbps</td><td>Multi-Link Operation, canales de 320 MHz, 4K-QAM</td></tr>
+              </tbody>
+            </table>
+
+            <h4>Evolución de la seguridad Wi-Fi</h4>
+            <table class="doc-table">
+              <thead><tr><th>Protocolo</th><th>Año</th><th>Cifrado</th><th>Estado</th><th>Vulnerabilidad conocida</th></tr></thead>
+              <tbody>
+                <tr><td><strong>WEP</strong></td><td>1997</td><td>RC4 (IV 24 bits)</td><td style="color:var(--red)">⛔ No usar</td><td>Roto en minutos con aircrack-ng; IV se repite rápidamente</td></tr>
+                <tr><td><strong>WPA</strong></td><td>2003</td><td>TKIP (basado en RC4)</td><td style="color:var(--red)">⛔ Deprecado</td><td>TKIP MIC attack; parche temporal sobre WEP</td></tr>
+                <tr><td><strong>WPA2</strong></td><td>2004</td><td>AES-CCMP (<code>802.11i</code>)</td><td style="color:var(--yellow)">⚠ Aceptable</td><td>KRACK (2017), PMKID attack; requiere contraseñas fuertes</td></tr>
+                <tr><td><strong>WPA3</strong></td><td>2018</td><td>SAE + AES-CCMP/GCMP</td><td style="color:var(--green)">✓ Recomendado</td><td>SAE side-channel (parcheado); resistente a diccionario offline y PFS</td></tr>
+              </tbody>
+            </table>
+            <p><strong>SAE (Simultaneous Authentication of Equals)</strong>, también llamado Dragonfly, es el reemplazo de PSK en WPA3. Resiste ataques de diccionario offline porque cada intento de autenticación requiere una interacción online con el AP. Además provee <em>Perfect Forward Secrecy</em>: capturar el tráfico pasado no compromete sesiones futuras aunque se robe la contraseña.</p>
+
+          </div>
+        </details>
+
+        <details class="doc-section">
+          <summary>Reto 4: Phishing y Seguridad del Correo Electrónico</summary>
+          <div class="doc-section-body">
+
+            <h4>Por qué SMTP permite spoofing</h4>
+            <p>El protocolo <strong>SMTP (<code>RFC 5321</code>)</strong> fue diseñado en los años 80 sin mecanismos de autenticación del remitente. El campo <code>MAIL FROM:</code> (sobre SMTP) y el encabezado <code>From:</code> (del mensaje) pueden contener cualquier dirección sin verificación. Esto hace que el spoofing de remitente sea trivial por defecto.</p>
+            <p>Técnicas de engaño en el dominio del remitente:</p>
+            <ul>
+              <li><strong>Typosquatting:</strong> registro de dominios similares — <code>paypa1.com</code>, <code>rniicrosoft.com</code></li>
+              <li><strong>Homoglifos (homograph attack):</strong> caracteres Unicode visualmente idénticos — "а" cirílico (U+0430) vs "a" latino (U+0061)</li>
+              <li><strong>Subdominios engañosos:</strong> <code>paypal.seguro-login.com</code> — el dominio real es <code>seguro-login.com</code></li>
+              <li><strong>Dominio de display vs. dirección real:</strong> mostrar "Banco Nacional &lt;soporte@banco.com&gt;" cuando la dirección real es <code>attacker@evil.ru</code></li>
+            </ul>
+
+            <h4>Autenticación de correo: SPF, DKIM y DMARC</h4>
+            <p><strong>SPF — Sender Policy Framework (<code>RFC 7208</code>):</strong></p>
+            <p>Registro TXT en DNS que lista las IPs y servidores autorizados a enviar email para el dominio.</p>
+            <pre style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;overflow-x:auto;font-family:var(--mono);font-size:.82rem;color:var(--accent);margin:8px 0">v=spf1 include:_spf.google.com ip4:203.0.113.1 -all</pre>
+            <ul>
+              <li><code>-all</code>: rechazar mensajes que no coincidan (hard fail)</li>
+              <li><code>~all</code>: marcar como spam (soft fail)</li>
+              <li><code>+all</code>: aceptar todo — extremadamente inseguro, nunca usar</li>
+            </ul>
+            <p>Limitación: SPF verifica el dominio <code>MAIL FROM</code> (envelope), no el <code>From:</code> visible al usuario. Un atacante puede pasar SPF con su propio dominio y falsificar el <code>From:</code> visible.</p>
+
+            <p><strong>DKIM — DomainKeys Identified Mail (<code>RFC 6376</code>):</strong></p>
+            <p>El servidor de correo firma el mensaje (cabeceras + cuerpo) con una clave privada. La clave pública se publica en DNS. El receptor verifica la firma, garantizando integridad del mensaje y autenticidad del dominio firmante.</p>
+            <pre style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;overflow-x:auto;font-family:var(--mono);font-size:.82rem;color:var(--accent);margin:8px 0">selector._domainkey.example.com  TXT  "v=DKIM1; k=rsa; p=MIGfMA0GCSq..."</pre>
+
+            <p><strong>DMARC — Domain-based Message Authentication (<code>RFC 7489</code>):</strong></p>
+            <p>Combina SPF y DKIM, y define la política de acción cuando ambos fallan o no están alineados con el dominio <code>From:</code>.</p>
+            <pre style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;overflow-x:auto;font-family:var(--mono);font-size:.82rem;color:var(--accent);margin:8px 0">_dmarc.example.com  TXT  "v=DMARC1; p=reject; pct=100; rua=mailto:dmarc@example.com"</pre>
+            <table class="doc-table">
+              <thead><tr><th>Política DMARC</th><th>Acción si falla</th><th>Uso recomendado</th></tr></thead>
+              <tbody>
+                <tr><td><code>p=none</code></td><td>Solo reportar, no filtrar</td><td>Fase inicial de despliegue / monitoreo</td></tr>
+                <tr><td><code>p=quarantine</code></td><td>Enviar a carpeta spam</td><td>Transición antes de reject</td></tr>
+                <tr><td><code>p=reject</code></td><td>Rechazar el mensaje en el servidor</td><td>Producción (máxima protección)</td></tr>
+              </tbody>
+            </table>
+            <div class="callout tip"><strong>Alineación DMARC:</strong> Para que DMARC pase, el dominio del <code>From:</code> visible debe alinearse con el dominio que pasa SPF o DKIM. Esto cierra el hueco que deja SPF solo.</div>
+
+            <h4>Taxonomía de ataques de phishing</h4>
+            <table class="doc-table">
+              <thead><tr><th>Tipo</th><th>Canal</th><th>Objetivo</th><th>Personalización</th><th>Ejemplo característico</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Mass phishing</strong></td><td>Email masivo</td><td>Miles de usuarios</td><td>Baja</td><td>"Tu cuenta bancaria ha sido suspendida"</td></tr>
+                <tr><td><strong>Spear phishing</strong></td><td>Email dirigido</td><td>Individuo específico</td><td>Alta (nombre, cargo, empresa)</td><td>Email con nombre real del destinatario y referencia a un proyecto interno</td></tr>
+                <tr><td><strong>Whaling</strong></td><td>Email dirigido</td><td>C-suite (CEO, CFO, CISO)</td><td>Muy alta</td><td>Solicitud urgente de transferencia bancaria al CEO</td></tr>
+                <tr><td><strong>Vishing</strong></td><td>Llamada telefónica</td><td>Cualquiera</td><td>Media</td><td>"Soy del soporte de Microsoft, detectamos un virus en su PC"</td></tr>
+                <tr><td><strong>Smishing</strong></td><td>SMS</td><td>Usuarios móviles</td><td>Baja–media</td><td>"Tu paquete DHL no pudo entregarse, haz clic aquí"</td></tr>
+                <tr><td><strong>BEC</strong></td><td>Email interno comprometido</td><td>Empleados con acceso a finanzas</td><td>Muy alta</td><td>Factura falsa de proveedor conocido, cambio de cuenta bancaria</td></tr>
+              </tbody>
+            </table>
+
+            <h4>Indicadores de phishing por categoría</h4>
+            <div class="cb-row">
+              <div class="cb-block">
+                <div class="cb-label" style="color:var(--red)">Indicadores técnicos</div>
+                <ul>
+                  <li>Dirección real del remitente no coincide con el nombre visible</li>
+                  <li>Cabecera <code>Received-from</code> apunta a un servidor desconocido o sospechoso</li>
+                  <li><code>Authentication-Results: spf=fail; dkim=fail; dmarc=fail</code></li>
+                  <li>El enlace al hacer hover muestra una URL diferente a la del texto</li>
+                  <li>Adjunto con extensión de riesgo: <code>.exe</code>, <code>.docm</code>, <code>.iso</code>, <code>.lnk</code>, <code>.js</code>, <code>.vbs</code></li>
+                  <li>URL acortada que oculta el destino real</li>
+                </ul>
+              </div>
+              <div class="cb-block">
+                <div class="cb-label" style="color:var(--yellow)">Indicadores de contenido</div>
+                <ul>
+                  <li>Urgencia artificial ("Tienes 24 horas para actuar")</li>
+                  <li>Amenaza de consecuencias negativas (cierre de cuenta, multa)</li>
+                  <li>Solicitud de credenciales, contraseñas o datos de tarjeta</li>
+                  <li>Saludo genérico ("Estimado cliente", "Dear user")</li>
+                  <li>Errores ortográficos o gramática inusual</li>
+                  <li>Oferta demasiado buena para ser verdad</li>
+                  <li>Solicitud de guardar silencio o actuar fuera de los canales habituales</li>
+                </ul>
+              </div>
+            </div>
+
+            <h4>Psicología de la ingeniería social</h4>
+            <p>El phishing explota principios psicológicos estudiados por Robert Cialdini en <em>Influence: The Psychology of Persuasion</em>:</p>
+            <table class="doc-table">
+              <thead><tr><th>Principio</th><th>Cómo se aplica en phishing</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Autoridad</strong></td><td>Impersonar al banco, al jefe, a organismos gubernamentales o a soporte técnico</td></tr>
+                <tr><td><strong>Urgencia / Escasez</strong></td><td>Deadline artificial ("tu cuenta se cierra en 2 horas"), oferta limitada</td></tr>
+                <tr><td><strong>Miedo</strong></td><td>Amenaza de consecuencias legales, pérdida de acceso, cargo no autorizado</td></tr>
+                <tr><td><strong>Reciprocidad</strong></td><td>Regalo o recompensa que "solo requiere verificar" tus datos</td></tr>
+                <tr><td><strong>Prueba social</strong></td><td>"Miles de clientes ya han actualizado su información"</td></tr>
+                <tr><td><strong>Simpatía</strong></td><td>Correo personalizado que parece venir de un colega o amigo</td></tr>
+              </tbody>
+            </table>
+            <div class="callout alert"><strong>Estadísticas relevantes (para discusión):</strong> El 91% de los ciberataques exitosos comienza con un email de phishing. El tiempo medio hasta que un empleado hace clic en un enlace malicioso desde que recibe el correo es de 16 minutos. La capacitación periódica con simulacros reduce la tasa de clics en un 50–75% según estudios de Proofpoint y KnowBe4.</div>
+
+          </div>
+        </details>
+
+      </div><!-- /doc-panel-spec -->
+
+    </section><!-- /sec-docs -->
 
   </main>
 

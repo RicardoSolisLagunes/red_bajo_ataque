@@ -112,6 +112,39 @@ const app = (() => {
     `).join('');
   }
 
+  // ---- Docs button in header ----
+
+  function _initDocsBtn() {
+    document.getElementById('btn-docs').addEventListener('click', () => {
+      if (_activeChallenge && _challenges[_activeChallenge]) {
+        _challenges[_activeChallenge].reset();
+      }
+      _activeChallenge = null;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('main > section').forEach(s => {
+        s.classList.add('hidden');
+        s.classList.remove('active');
+      });
+      const sec = document.getElementById('sec-docs');
+      sec.classList.remove('hidden');
+      sec.classList.add('active');
+    });
+  }
+
+  // ---- Docs sub-panel switching ----
+
+  function _initDocs() {
+    document.querySelectorAll('.doc-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.doc-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.doc-panel').forEach(p => p.classList.add('hidden'));
+        btn.classList.add('active');
+        const panel = document.getElementById('doc-panel-' + btn.dataset.panel);
+        if (panel) panel.classList.remove('hidden');
+      });
+    });
+  }
+
   // ---- Home card navigation ----
 
   function _initHomeCards() {
@@ -134,6 +167,8 @@ const app = (() => {
     _initNombre();
     _initRouter();
     _initHomeCards();
+    _initDocsBtn();
+    _initDocs();
     refrescarChecks();
   }
 

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Red Bajo Ataque</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Name modal — blocks interaction until a nickname is entered -->
+  <div id="modal-nombre" class="modal-overlay">
+    <div class="modal-box">
+      <h2>Red Bajo Ataque</h2>
+      <p>Ingresa tu nickname para comenzar</p>
+      <input type="text" id="input-nombre" placeholder="Tu nickname" maxlength="20" autofocus>
+      <button id="btn-empezar" class="btn-primary" style="width:100%">Empezar</button>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <span class="app-title">Red Bajo Ataque</span>
+    <span class="app-player">👤 <span id="display-nombre"></span></span>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-target="#sec-inicio">Inicio</button>
+    <button class="tab" data-target="#sec-cable-perdido"  data-challenge="cable_perdido">El cable perdido<span class="check-mark"></span></button>
+    <button class="tab" data-target="#sec-la-intrusa"     data-challenge="la_intrusa">La intrusa<span class="check-mark"></span></button>
+    <button class="tab" data-target="#sec-identifica-red" data-challenge="identifica_red">Identifica la red<span class="check-mark"></span></button>
+    <button class="tab" data-target="#sec-anti-phishing"  data-challenge="anti_phishing">Anti-phishing<span class="check-mark"></span></button>
+    <button class="tab" data-target="#sec-scoreboard">Scoreboard</button>
+  </nav>
+
+  <main>
+
+    <!-- Inicio -->
+    <section id="sec-inicio" class="active">
+      <h1>Bienvenido a <span class="highlight">Red Bajo Ataque</span></h1>
+      <p class="intro-text">
+        Un videojuego educativo sobre redes y ciberseguridad.
+        Supera los cuatro retos para aprender sobre topologías, dispositivos y ataques de ingeniería social.
+      </p>
+      <div class="challenge-cards">
+        <div class="card" id="card-cable">
+          <div class="card-icon">🔌</div>
+          <h3>El cable perdido</h3>
+          <p>Identifica el cable defectuoso en distintas topologías: estrella, bus, anillo y malla.</p>
+        </div>
+        <div class="card" id="card-intrusa">
+          <div class="card-icon">🔍</div>
+          <h3>La intrusa</h3>
+          <p>Detecta el dispositivo no autorizado o malicioso conectado a la red.</p>
+        </div>
+        <div class="card" id="card-identifica">
+          <div class="card-icon">🌐</div>
+          <h3>Identifica la red</h3>
+          <p>Clasifica el tipo de red (PAN/LAN/MAN/WAN/WLAN) y su topología a partir de los componentes.</p>
+        </div>
+        <div class="card" id="card-phishing">
+          <div class="card-icon">🎣</div>
+          <h3>Anti-phishing</h3>
+          <p>Detecta los correos de phishing en tu bandeja de entrada identificando sus indicadores.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reto 1 — El cable perdido -->
+    <section id="sec-cable-perdido" class="hidden"></section>
+
+    <!-- Reto 2 — La intrusa -->
+    <section id="sec-la-intrusa" class="hidden"></section>
+
+    <!-- Reto 3 — Identifica la red -->
+    <section id="sec-identifica-red" class="hidden"></section>
+
+    <!-- Reto 4 — Anti-phishing -->
+    <section id="sec-anti-phishing" class="hidden"></section>
+
+    <!-- Scoreboard -->
+    <section id="sec-scoreboard" class="hidden">
+      <div class="scoreboard-header">
+        <h2>🏆 Scoreboard</h2>
+        <button class="btn-secondary" onclick="memory.exportarScoreboard()">⬇ Exportar scoreboard.txt</button>
+      </div>
+      <table class="scoreboard-table" id="tabla-scoreboard">
+        <thead>
+          <tr><th>#</th><th>Nombre</th><th>Score</th><th>Tiempo (s)</th></tr>
+        </thead>
+        <tbody id="cuerpo-scoreboard"></tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Curso de Redes &middot; Red Bajo Ataque</p>
+  </footer>
+
+  <script src="js/timer.js"></script>
+  <script src="js/memory.js"></script>
+  <script src="js/challenges/cable_perdido.js"></script>
+  <script src="js/challenges/la_intrusa.js"></script>
+  <script src="js/challenges/identifica_red.js"></script>
+  <script src="js/challenges/anti_phishing.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

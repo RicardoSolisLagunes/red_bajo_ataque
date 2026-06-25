@@ -80,7 +80,20 @@ html, body {
   font-size: 1.2rem; font-weight: 700;
   color: var(--accent); letter-spacing: .04em;
 }
-.app-player { color: var(--text2); font-size: .9rem; }
+.app-player { color: var(--text2); font-size: .9rem; display: flex; align-items: center; gap: 8px; }
+
+.btn-switch-player {
+  background: none;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text2);
+  font-size: .8rem;
+  padding: 2px 7px;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: border-color .15s, color .15s;
+}
+.btn-switch-player:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ---- Tabs ---- */
 
@@ -474,13 +487,7 @@ section.hidden { display: none; }
 
 /* ---- Scoreboard ---- */
 
-.scoreboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.scoreboard-header h2 { font-size: 1.3rem; }
+#sec-scoreboard h2 { margin-bottom: 20px; }
 
 .scoreboard-table {
   width: 100%;

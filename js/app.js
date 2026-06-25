@@ -74,6 +74,12 @@ const app = (() => {
 
     btn.addEventListener('click', confirmar);
     input.addEventListener('keydown', e => { if (e.key === 'Enter') confirmar(); });
+
+    document.getElementById('btn-nuevo-jugador').addEventListener('click', () => {
+      input.value = '';
+      modal.classList.remove('hidden');
+      setTimeout(() => input.focus(), 50);
+    });
   }
 
   // ---- Checkmarks on tabs ----

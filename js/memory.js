@@ -65,14 +65,6 @@ const memory = (() => {
     return [..._getRawScoreboard()].sort((a, b) => b.score - a.score);
   }
 
-  function exportarScoreboard() {
-    const json = JSON.stringify(obtenerScoreboardOrdenado(), null, 4);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
-    a.download = 'scoreboard.txt';
-    a.click();
-  }
-
   function getNombreActual() {
     return sessionStorage.getItem(K.player) || localStorage.getItem(K.player) || '';
   }
@@ -93,7 +85,6 @@ const memory = (() => {
     cargarScoreboard,
     registrarIntento,
     obtenerScoreboardOrdenado,
-    exportarScoreboard,
     getNombreActual,
     setNombreActual,
     estaCompletado

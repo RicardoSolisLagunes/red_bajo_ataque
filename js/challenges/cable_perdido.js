@@ -1,75 +1,131 @@
 /* El cable perdido
-   - Estrella/Bus: haz clic en el cable roto (modo click)
-   - Anillo/Malla: envía paquetes para deducir el enlace caído, luego haz clic en él (modo packet)
+   TEMPLATES definen la topología; _makeRound() elige el cable roto al azar.
+   - Estrella / Bus : clic en el cable
+   - Anillo / Malla : simulación de paquete + clic en el cable
 */
 const cablePerdido = (() => {
 
-  const ROUNDS = [
+  // ---- Round templates (sin cable roto fijo) ----
+
+  const TEMPLATES = [
     {
-      id: 'estrella-1',
       topologia: 'Estrella',
       mode: 'click',
-      enunciado: 'Un solo equipo perdió su conexión al switch. ¿Cuál cable está dañado?',
-      solucion: 'En topología estrella cada equipo tiene su propio cable directo al switch central. Solo PC3 quedó sin red, por lo que únicamente ese cable está dañado; el resto sigue funcionando con normalidad.',
-      svgFn: _svgEstrella
+      swPos: { x: 250, y: 150 },
+      pcs: [
+        { id: 'c1', label: 'PC1', x: 80,  y: 60  },
+        { id: 'c2', label: 'PC2', x: 420, y: 60  },
+        { id: 'c3', label: 'PC3', x: 420, y: 240 },
+        { id: 'c4', label: 'PC4', x: 80,  y: 240 }
+      ]
     },
     {
-      id: 'bus-1',
       topologia: 'Bus',
       mode: 'click',
-      enunciado: 'Dos equipos perdieron conexión. Localiza el tramo roto del cable coaxial.',
-      solucion: 'Una ruptura divide el bus en dos segmentos. PC1 y PC2 siguen conectados entre sí (están a la izquierda del corte), mientras que PC3 y PC4 quedaron aislados. El tramo roto es el segmento entre la derivación de PC2 y la de PC3.',
-      svgFn: _svgBus
+      pcs: [
+        { label: 'PC1', x: 90  },
+        { label: 'PC2', x: 195 },
+        { label: 'PC3', x: 300 },
+        { label: 'PC4', x: 405 }
+      ],
+      // Segmentos inter-PC clickeables (entre taps adyacentes)
+      segments: [
+        { id: 's1', li: 0, ri: 1 },   // PC1-PC2
+        { id: 's2', li: 1, ri: 2 },   // PC2-PC3
+        { id: 's3', li: 2, ri: 3 }    // PC3-PC4
+      ]
     },
     {
-      id: 'anillo-1',
       topologia: 'Anillo',
       mode: 'packet',
-      enunciado: 'Todas las PCs tienen conexión (el anillo es bidireccional). Envía paquetes entre equipos para descubrir qué enlace está dañado y haz clic en él.',
-      solucion: 'En un anillo bidireccional, aunque un enlace falle, los datos circulan en sentido contrario. El enlace roto era PC2–PC3: cualquier paquete entre esos nodos tomaba el camino largo (PC2→PC1→PC4→PC3) rodeando el anillo, en lugar de la ruta directa.',
+      vbW: 500, vbH: 340,
       nodes: {
         PC1: { x: 250, y: 55  },
         PC2: { x: 445, y: 175 },
         PC3: { x: 250, y: 295 },
         PC4: { x: 55,  y: 175 }
       },
-      links: [
-        { id: 'la', from: 'PC1', to: 'PC2', broken: false },
-        { id: 'lb', from: 'PC2', to: 'PC3', broken: true  },
-        { id: 'lc', from: 'PC3', to: 'PC4', broken: false },
-        { id: 'ld', from: 'PC4', to: 'PC1', broken: false }
-      ],
-      vbW: 500, vbH: 340
+      allLinks: [
+        { id: 'la', from: 'PC1', to: 'PC2' },
+        { id: 'lb', from: 'PC2', to: 'PC3' },
+        { id: 'lc', from: 'PC3', to: 'PC4' },
+        { id: 'ld', from: 'PC4', to: 'PC1' }
+      ]
     },
     {
-      id: 'malla-1',
       topologia: 'Malla',
       mode: 'packet',
-      enunciado: 'La red tiene rutas redundantes. Envía paquetes para detectar el enlace caído y haz clic en él.',
-      solucion: 'En malla la redundancia permite enrutar alrededor de un enlace caído. El enlace PC2–PC4 estaba roto: los paquetes entre esos equipos tomaban rutas alternativas (PC2→PC1→PC4 o PC2→PC3→PC4) en lugar de la ruta directa.',
+      vbW: 500, vbH: 305,
       nodes: {
         PC1: { x: 90,  y: 80  },
         PC2: { x: 410, y: 80  },
         PC3: { x: 90,  y: 225 },
         PC4: { x: 410, y: 225 }
       },
-      links: [
-        { id: 'm1', from: 'PC1', to: 'PC2', broken: false },
-        { id: 'm2', from: 'PC1', to: 'PC3', broken: false },
-        { id: 'm3', from: 'PC1', to: 'PC4', broken: false },
-        { id: 'm4', from: 'PC2', to: 'PC3', broken: false },
-        { id: 'm5', from: 'PC2', to: 'PC4', broken: true  },
-        { id: 'm6', from: 'PC3', to: 'PC4', broken: false }
-      ],
-      vbW: 500, vbH: 305
+      allLinks: [
+        { id: 'm1', from: 'PC1', to: 'PC2' },
+        { id: 'm2', from: 'PC1', to: 'PC3' },
+        { id: 'm3', from: 'PC1', to: 'PC4' },
+        { id: 'm4', from: 'PC2', to: 'PC3' },
+        { id: 'm5', from: 'PC2', to: 'PC4' },
+        { id: 'm6', from: 'PC3', to: 'PC4' }
+      ]
     }
   ];
 
-  // ---- State ----
+  // ---- Genera un round concreto con cable roto al azar ----
+
+  function _makeRound(tmpl) {
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+    if (tmpl.topologia === 'Estrella') {
+      const broken = pick(tmpl.pcs);
+      return {
+        ...tmpl,
+        brokenId: broken.id,
+        enunciado: 'Un solo equipo perdió su conexión al switch. ¿Cuál cable está dañado?',
+        solucion: `En topología estrella cada equipo tiene su propio cable directo al switch. Solo ${broken.label} quedó sin red, por lo que únicamente el cable de ${broken.label} está dañado; el resto sigue funcionando con normalidad.`
+      };
+    }
+
+    if (tmpl.topologia === 'Bus') {
+      const seg     = pick(tmpl.segments);
+      const online  = tmpl.pcs.filter((_, i) => i <= seg.li);
+      const offline = tmpl.pcs.filter((_, i) => i >  seg.li);
+      const count   = offline.length;
+      return {
+        ...tmpl,
+        brokenId:   seg.id,
+        offlineLiThreshold: seg.li,  // PCs at index > li are offline
+        enunciado: `${count === 1 ? 'Un equipo perdió' : count + ' equipos perdieron'} conexión. Localiza el tramo roto del cable coaxial.`,
+        solucion: `Una ruptura divide el bus en dos segmentos. ${online.map(p => p.label).join(' y ')} ${online.length === 1 ? 'sigue conectada' : 'siguen conectadas'} al segmento izquierdo, mientras ${offline.map(p => p.label).join(' y ')} ${offline.length === 1 ? 'quedó aislada' : 'quedaron aisladas'}. El tramo roto es el segmento entre ${tmpl.pcs[seg.li].label} y ${tmpl.pcs[seg.ri].label}.`
+      };
+    }
+
+    // Anillo / Malla
+    const broken = pick(tmpl.allLinks);
+    const links  = tmpl.allLinks.map(l => ({ ...l, broken: l.id === broken.id }));
+    const isAnillo = tmpl.topologia === 'Anillo';
+    return {
+      ...tmpl,
+      links,
+      brokenId: broken.id,
+      enunciado: isAnillo
+        ? 'Todas las PCs tienen conexión (el anillo es bidireccional). Envía paquetes entre equipos para descubrir qué enlace está dañado y haz clic en él.'
+        : 'La red tiene rutas redundantes. Envía paquetes para detectar el enlace caído y haz clic en él.',
+      solucion: isAnillo
+        ? `En un anillo bidireccional, aunque un enlace falle, los datos circulan en sentido contrario. El enlace roto era ${broken.from}–${broken.to}: cualquier paquete entre esos nodos tomaba el camino largo rodeando el anillo en lugar de la ruta directa.`
+        : `En malla la redundancia permite enrutar alrededor de un enlace caído. El enlace ${broken.from}–${broken.to} estaba roto: los paquetes tomaban rutas alternativas (p. ej. a través de otras PCs) en lugar de la ruta directa.`
+    };
+  }
+
+  // ---- Estado ----
+
   let _sec       = null;
-  let _round     = 0;
+  let _roundIdx  = 0;
   let _mistakes  = 0;
-  let _packetSrc = null;   // selected source PC id (packet mode)
+  let _rounds    = [];   // live rounds generados en init()
+  let _packetSrc = null;
   let _animating = false;
   let _animRaf   = null;
 
@@ -94,8 +150,8 @@ const cablePerdido = (() => {
 
   function _bfs(graph, start, end) {
     if (start === end) return [start];
-    const queue    = [[start, [start]]];
-    const visited  = new Set([start]);
+    const queue   = [[start, [start]]];
+    const visited = new Set([start]);
     while (queue.length) {
       const [node, path] = queue.shift();
       for (const nb of (graph[node] || [])) {
@@ -130,22 +186,23 @@ const cablePerdido = (() => {
     _animating = false;
     if (_animRaf) { cancelAnimationFrame(_animRaf); _animRaf = null; }
 
-    const r       = ROUNDS[_round];
+    const r       = _rounds[_roundIdx];
     const content = _sec.querySelector('#cp-content');
-    if (r.mode === 'click')  _renderClickRound(r, content);
-    else                     _renderPacketRound(r, content);
+    if (r.mode === 'click') _renderClickRound(r, content);
+    else                    _renderPacketRound(r, content);
   }
 
-  // ---- Click mode (estrella, bus) ----
+  // ---- Modo click (estrella, bus) ----
 
   function _renderClickRound(r, content) {
     content.innerHTML = `
-      <div class="round-indicator">Round ${_round + 1} / ${ROUNDS.length} — Topología: <strong>${r.topologia}</strong></div>
+      <div class="round-indicator">Round ${_roundIdx + 1} / ${_rounds.length} — Topología: <strong>${r.topologia}</strong></div>
       <p class="ch-desc">${r.enunciado}</p>
       <div class="topology-wrap" id="topo-svg"></div>
       <div id="cp-fb" class="round-feedback hidden"></div>
     `;
-    content.querySelector('#topo-svg').innerHTML = r.svgFn();
+    content.querySelector('#topo-svg').innerHTML =
+      r.topologia === 'Estrella' ? _svgEstrella(r) : _svgBus(r);
     _attachCableHandlers();
   }
 
@@ -165,11 +222,11 @@ const cablePerdido = (() => {
     });
   }
 
-  // ---- Packet mode (anillo, malla) ----
+  // ---- Modo packet (anillo, malla) ----
 
   function _renderPacketRound(r, content) {
     content.innerHTML = `
-      <div class="round-indicator">Round ${_round + 1} / ${ROUNDS.length} — Topología: <strong>${r.topologia}</strong></div>
+      <div class="round-indicator">Round ${_roundIdx + 1} / ${_rounds.length} — Topología: <strong>${r.topologia}</strong></div>
       <p class="ch-desc">${r.enunciado}</p>
       <p class="packet-hint" id="pkt-hint">Haz clic en una PC para seleccionarla como origen del paquete</p>
       <div class="topology-wrap" id="topo-svg"></div>
@@ -177,13 +234,10 @@ const cablePerdido = (() => {
     `;
     content.querySelector('#topo-svg').innerHTML = _buildPacketSvg(r);
 
-    // PC click handlers
     Object.keys(r.nodes).forEach(pcId => {
       const el = _sec.querySelector(`[data-pc-id="${pcId}"]`);
       if (el) el.addEventListener('click', () => _onPcClick(r, pcId));
     });
-
-    // Cable click + hover handlers
     _attachCableHandlers();
   }
 
@@ -191,13 +245,11 @@ const cablePerdido = (() => {
     const textY = r.vbH - 15;
     let svg = `<svg viewBox="0 0 ${r.vbW} ${r.vbH}" class="topo-svg" id="packet-svg">`;
 
-    // Cables behind nodes
     r.links.forEach(l => {
       const f = r.nodes[l.from], t = r.nodes[l.to];
       svg += _cable(f.x, f.y, t.x, t.y, l.id, l.broken);
     });
 
-    // Nodes on top of cables
     Object.entries(r.nodes).forEach(([id, n]) => {
       svg += `
         <rect x="${n.x - 28}" y="${n.y - 18}" width="56" height="36" rx="6"
@@ -209,14 +261,12 @@ const cablePerdido = (() => {
       `;
     });
 
-    svg += `<text x="${r.vbW / 2}" y="${textY}" text-anchor="middle" fill="#475569" font-size="10">
-      Clic en PC → enviar paquete · Clic en cable → marcar como dañado
-    </text>`;
+    svg += `<text x="${r.vbW / 2}" y="${textY}" text-anchor="middle" fill="#475569" font-size="10">Clic en PC → enviar paquete · Clic en cable → marcar como dañado</text>`;
     svg += `</svg>`;
     return svg;
   }
 
-  // ---- PC interaction (packet mode) ----
+  // ---- Interacción PC (modo packet) ----
 
   function _onPcClick(r, pcId) {
     if (_animating) return;
@@ -224,7 +274,7 @@ const cablePerdido = (() => {
     if (!_packetSrc) {
       _packetSrc = pcId;
       _highlightPc(pcId, true);
-      _setHint(`Origen: ${pcId} — Ahora selecciona el destino`);
+      _setHint(`Origen: ${pcId} — Selecciona el destino`);
     } else if (pcId === _packetSrc) {
       _highlightPc(_packetSrc, false);
       _packetSrc = null;
@@ -253,18 +303,18 @@ const cablePerdido = (() => {
     if (!el) return;
     el.setAttribute('fill',         on ? '#0a3050' : '#1a2a3a');
     el.setAttribute('stroke',       on ? '#00c8ff' : '#4a9eca');
-    el.setAttribute('stroke-width', on ? '3'       : '2');
+    el.setAttribute('stroke-width', on ? '3' : '2');
   }
 
-  function _setHint(text) {
+  function _setHint(txt) {
     const el = _sec.querySelector('#pkt-hint');
-    if (el) el.textContent = text;
+    if (el) el.textContent = txt;
   }
 
-  // ---- Packet animation ----
+  // ---- Animación del paquete ----
 
   function _animatePacket(nodes, path, svgEl, onDone) {
-    const NS = 'http://www.w3.org/2000/svg';
+    const NS     = 'http://www.w3.org/2000/svg';
     const circle = document.createElementNS(NS, 'circle');
     circle.setAttribute('r', '9');
     circle.setAttribute('fill', '#00c8ff');
@@ -306,11 +356,11 @@ const cablePerdido = (() => {
     _animRaf = requestAnimationFrame(step);
   }
 
-  // ---- Cable click (both modes) ----
+  // ---- Clic en cable (ambos modos) ----
 
   function _onCableClick(cableId) {
-    const visEl = _sec.querySelector(`[data-cable-id="${cableId}"][data-role="vis"]`);
-    const fb    = _sec.querySelector('#cp-fb');
+    const visEl  = _sec.querySelector(`[data-cable-id="${cableId}"][data-role="vis"]`);
+    const fb     = _sec.querySelector('#cp-fb');
     const broken = visEl && visEl.dataset.defectuoso === 'true';
 
     if (broken) {
@@ -335,11 +385,11 @@ const cablePerdido = (() => {
   }
 
   function _nextRound() {
-    _round++;
-    if (_round >= ROUNDS.length) _showResult(); else _renderRound();
+    _roundIdx++;
+    if (_roundIdx >= _rounds.length) _showResult(); else _renderRound();
   }
 
-  // ---- Result ----
+  // ---- Resultado ----
 
   function _showResult() {
     timer.stop();
@@ -360,7 +410,7 @@ const cablePerdido = (() => {
         </div>
       </div>
       <h4>Soluciones comentadas</h4>
-      ${ROUNDS.map(r => `
+      ${_rounds.map(r => `
         <div class="sol-item sol-ok">
           <div class="sol-hdr"><strong>${r.topologia}</strong></div>
           <p class="sol-texto">${r.solucion}</p>
@@ -377,7 +427,7 @@ const cablePerdido = (() => {
     result.scrollIntoView({ behavior: 'smooth' });
   }
 
-  // ---- SVG primitives ----
+  // ---- SVG primitivos ----
 
   function _cable(x1, y1, x2, y2, id, broken) {
     const color = '#4a9eca';
@@ -414,57 +464,71 @@ const cablePerdido = (() => {
     `;
   }
 
-  // ---- Static SVGs (click mode) ----
+  // ---- SVG generadores (usan el round live) ----
 
-  function _svgEstrella() {
-    return `<svg viewBox="0 0 500 300" class="topo-svg">
-      ${_cable(250,150, 80,60,   'c1', false)}
-      ${_cable(250,150, 420,60,  'c2', false)}
-      ${_cable(250,150, 420,240, 'c3', true)}
-      ${_cable(250,150, 80,240,  'c4', false)}
-      ${_switch(250,150)}
-      ${_node(80,60,   'PC1', false)}
-      ${_node(420,60,  'PC2', false)}
-      ${_node(420,240, 'PC3', true)}
-      ${_node(80,240,  'PC4', false)}
-      <text x="250" y="285" text-anchor="middle" fill="#64748b" font-size="11">Haz clic en el cable defectuoso</text>
-    </svg>`;
+  function _svgEstrella(r) {
+    const sw = r.swPos;
+    let svg = `<svg viewBox="0 0 500 300" class="topo-svg">`;
+    r.pcs.forEach(pc => {
+      svg += _cable(sw.x, sw.y, pc.x, pc.y, pc.id, pc.id === r.brokenId);
+    });
+    svg += _switch(sw.x, sw.y);
+    r.pcs.forEach(pc => {
+      svg += _node(pc.x, pc.y, pc.label, pc.id === r.brokenId);
+    });
+    svg += `<text x="250" y="285" text-anchor="middle" fill="#64748b" font-size="11">Haz clic en el cable defectuoso</text>`;
+    svg += `</svg>`;
+    return svg;
   }
 
-  function _svgBus() {
+  function _svgBus(r) {
     const busY = 190, pcY = 105;
-    const pcs  = [{ x: 90, l: 'PC1' }, { x: 195, l: 'PC2' }, { x: 300, l: 'PC3' }, { x: 405, l: 'PC4' }];
+    const { pcs, segments, brokenId, offlineLiThreshold } = r;
     let svg = `<svg viewBox="0 0 500 260" class="topo-svg">`;
-    // Terminators
+
+    // Terminadores
     svg += `<circle cx="50"  cy="${busY}" r="8" fill="#0d2a3a" stroke="#4a9eca" stroke-width="2"/>`;
     svg += `<circle cx="450" cy="${busY}" r="8" fill="#0d2a3a" stroke="#4a9eca" stroke-width="2"/>`;
-    // Bus segments — break between PC2 (x=195) and PC3 (x=300)
-    svg += _cable(50,  busY, 90,  busY, 's0', false);
-    svg += _cable(90,  busY, 195, busY, 's1', false);
-    svg += _cable(195, busY, 300, busY, 's2', true);   // ← BROKEN
-    svg += _cable(300, busY, 405, busY, 's3', false);
-    svg += _cable(405, busY, 450, busY, 's4', false);
-    // Drop lines and PC nodes — PC3 and PC4 are offline
+
+    // Segmentos no clickeables (extremos del bus)
+    svg += `<line x1="50" y1="${busY}" x2="${pcs[0].x}" y2="${busY}"
+                  stroke="#4a9eca" stroke-width="4" stroke-linecap="round"
+                  style="pointer-events:none"/>`;
+    svg += `<line x1="${pcs[pcs.length-1].x}" y1="${busY}" x2="450" y2="${busY}"
+                  stroke="#4a9eca" stroke-width="4" stroke-linecap="round"
+                  style="pointer-events:none"/>`;
+
+    // Segmentos inter-PC clickeables
+    segments.forEach(seg => {
+      svg += _cable(pcs[seg.li].x, busY, pcs[seg.ri].x, busY, seg.id, seg.id === brokenId);
+    });
+
+    // Derivaciones y nodos PC
     pcs.forEach((p, i) => {
-      const offline = i >= 2;
+      const offline = i > offlineLiThreshold;
       svg += `<line x1="${p.x}" y1="${busY}" x2="${p.x}" y2="${pcY + 18}"
                     stroke="#4a9eca" stroke-width="2"/>`;
-      svg += _node(p.x, pcY, p.l, offline);
+      svg += _node(p.x, pcY, p.label, offline);
     });
+
     svg += `<text x="250" y="245" text-anchor="middle" fill="#64748b" font-size="11">Haz clic en el tramo roto</text>`;
     svg += `</svg>`;
     return svg;
   }
 
-  // ---- Public API ----
+  // ---- API pública ----
 
   async function init(sec) {
-    _sec       = sec;
-    _round     = 0;
-    _mistakes  = 0;
+    _sec      = sec;
+    _roundIdx = 0;
+    _mistakes = 0;
     _packetSrc = null;
     _animating = false;
     if (_animRaf) { cancelAnimationFrame(_animRaf); _animRaf = null; }
+
+    // Generar todos los rounds con cables rotos al azar
+    _rounds = TEMPLATES.map(_makeRound);
+
     _sec.innerHTML = _renderShell();
     _renderRound();
     timer.start(s => {
@@ -478,8 +542,9 @@ const cablePerdido = (() => {
     if (_animRaf) { cancelAnimationFrame(_animRaf); _animRaf = null; }
     _animating = false;
     _packetSrc = null;
-    _round     = 0;
+    _roundIdx  = 0;
     _mistakes  = 0;
+    _rounds    = [];
   }
 
   function reintentar() { reset(); init(_sec); }

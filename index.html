@@ -20,7 +20,10 @@
 
   <header class="app-header">
     <span class="app-title">Red Bajo Ataque</span>
-    <span class="app-player">👤 <span id="display-nombre"></span></span>
+    <span class="app-player">
+      👤 <span id="display-nombre"></span>
+      <button id="btn-nuevo-jugador" class="btn-switch-player" title="Cambiar jugador">✎</button>
+    </span>
   </header>
 
   <nav class="tabs">
@@ -79,10 +82,7 @@
 
     <!-- Scoreboard -->
     <section id="sec-scoreboard" class="hidden">
-      <div class="scoreboard-header">
-        <h2>🏆 Scoreboard</h2>
-        <button class="btn-secondary" onclick="memory.exportarScoreboard()">⬇ Exportar scoreboard.txt</button>
-      </div>
+      <h2>🏆 Scoreboard</h2>
       <table class="scoreboard-table" id="tabla-scoreboard">
         <thead>
           <tr><th>#</th><th>Nombre</th><th>Score</th><th>Tiempo (s)</th></tr>

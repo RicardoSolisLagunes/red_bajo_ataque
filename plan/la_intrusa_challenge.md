@@ -1,81 +1,68 @@
 # Reto: La intrusa
 
-> Implementación objetivo: `js/challenges/la_intrusa.js`.
+> **Estado: ✅ Completado** — `js/challenges/la_intrusa.js`
 > Comparte motor de puntaje y timer (ver [`memory.md`](./memory.md), [`main.md`](./main.md)).
 
 ## 1. Objetivo de aprendizaje y temas
 
 El jugador aprende a **identificar un dispositivo no autorizado/malicioso** en un
-diagrama de red, distinguiéndolo de los dispositivos legítimos.
+diagrama de red, distinguiéndolo de los dispositivos legítimos por su posición en
+la arquitectura, sus credenciales y el contexto.
 
-**Temas de redes cubiertos:**
-- Dispositivos de red legítimos: router, switch, access point (AP), firewall, servidor,
-  PC, impresora.
-- Amenazas: **rogue AP** (punto de acceso no autorizado), dispositivo con MAC/IP no
-  registrada, sniffer conectado a un puerto espejo, equipo conectado fuera del firewall.
-- Conceptos básicos: segmentación, qué dispositivos "deberían" estar y dónde.
+**Temas cubiertos:**
+- Rogue AP, bypass de firewall, dispositivo con MAC/IP no registrada.
+- Segmentación: la posición del dispositivo importa tanto como su tipo.
+- Comparar lo detectado vs. un inventario de activos aprobados.
 
-## 2. Investigación técnica (lo que enseña el reto)
+## 2. Mecánica implementada
 
-- **Rogue AP:** un AP conectado sin autorización crea una puerta inalámbrica que
-  bypassa controles; pista: un AP extra colgando de un switch interno o con SSID
-  desconocido.
-- **Dispositivo no autorizado por MAC/IP:** en un inventario, el equipo cuya MAC/IP no
-  aparece en la lista aprobada es el intruso.
-- **Ubicación indebida:** un host conectado **antes** del firewall, o un equipo en una
-  VLAN que no le corresponde, indica intrusión.
-- **Sniffer/duplicado:** un dispositivo conectado a un puerto donde no debería haber
-  tráfico replicado.
-- La solución comentada explica *por qué* el resto de dispositivos sí son legítimos.
+El reto tiene **múltiples rounds** con distintos tipos de intrusión. Cada round muestra:
+- Un **diagrama de red** con dispositivos renderizados como tarjetas HTML clicables
+  (`dev-card`), organizadas en capas (Internet → firewall → switch → LAN).
+- Una **tabla de inventario** con las IPs y MACs autorizadas, para que el jugador compare.
 
-## 3. Mecánica de juego
+**Flujo:**
+1. El jugador hace clic en el dispositivo que cree intruso.
+2. **Acierto:** el dispositivo se resalta en rojo (`dev-intruso-found`) y avanza al siguiente round.
+3. **Error:** destello amarillo (`dev-wrong-flash`) y +1 error; puede seguir intentando.
+4. Al terminar todos los rounds: bloque de resultado con soluciones comentadas + puntaje.
 
-- Se muestra un **diagrama de red** con varios dispositivos (íconos clicables).
-- El enunciado da el contexto (p. ej. "lista de equipos autorizados" o "algo no encaja").
-- El jugador **hace clic en el dispositivo intruso**.
-- **Acierto:** resuelto. **Error:** +1 error, el dispositivo se marca como legítimo y
-  puede seguir intentando.
-- Puede haber varios **rounds** con distintos tipos de intrusión.
-- Al terminar: **solución comentada** + puntaje (motor compartido).
+**Decisión de diseño:** los dispositivos intrusos tienen nombres neutros (p. ej. `AP-03`,
+`Laptop-07`) sin tooltips ni etiquetas que delaten su naturaleza, para que el jugador
+deba analizar la topología en lugar de buscar el nombre "más raro".
 
-## 4. Modelo de datos (data-driven)
+## 3. Modelo de datos implementado
 
 ```js
-const LA_INTRUSA_ROUNDS = [
+const ROUNDS = [
   {
-    id: "rogue-ap-1",
-    enunciado: "Esta red corporativa tiene un equipo que no debería estar. ¿Cuál es?",
-    asset: "src/diagrama_red.svg",                // placeholder
+    id: 'rogue-ap',
+    enunciado: '...',
     dispositivos: [
-      { id: "router", tipo: "router",   intruso: false },
-      { id: "sw1",    tipo: "switch",   intruso: false },
-      { id: "fw",     tipo: "firewall", intruso: false },
-      { id: "ap_x",   tipo: "ap",       intruso: true,  motivo: "AP no autorizado (rogue AP)" },
-      { id: "pc1",    tipo: "pc",       intruso: false }
+      { id: 'internet', tipo: 'internet', label: 'Internet', role: 'Acceso externo', intruso: false },
+      { id: 'router',   tipo: 'router',   label: 'Router',   role: 'Gateway',        intruso: false },
+      { id: 'fw',       tipo: 'firewall', label: 'Firewall', role: 'Perímetro',       intruso: false },
+      { id: 'sw',       tipo: 'switch',   label: 'Switch',   role: 'Distribución',    intruso: false },
+      { id: 'ap03',     tipo: 'ap',       label: 'AP-03',    role: 'Punto de acceso', intruso: true  },
+      // ...
     ],
-    solucion: "El AP 'ap_x' fue conectado sin autorización al switch interno: crea una " +
-              "entrada inalámbrica que evade el firewall. Router, switch, firewall y PC " +
-              "son parte del diseño aprobado."
+    inventario: [
+      { ip: '192.168.1.1', mac: 'AA:BB:CC:DD:EE:01', dispositivo: 'Router', autorizado: true },
+      // ...
+    ],
+    solucion: '...'
   },
-  // ... rounds: MAC no autorizada, host fuera del firewall, sniffer
+  // ... otros rounds: MAC no registrada, host fuera del firewall, etc.
 ];
 ```
 
-## 5. Assets requeridos (`/src`, placeholders)
+## 4. Assets
 
-- `router.svg`, `switch.svg`, `firewall.svg`, `access_point.svg`, `pc.svg`,
-  `servidor.svg`, `impresora.svg`, `dispositivo_intruso.svg`.
-- Marcadores: `marca_correcto.svg`, `marca_incorrecto.svg`.
-- Cada dispositivo es clicable con `data-id`.
+Sin archivos en `/src/`. Los dispositivos se renderizan con **emojis + HTML** en las
+tarjetas `dev-card`. Los íconos por tipo de dispositivo son emojis estándar (🌐 🔒 🔌 💻 etc.).
 
-## 6. Enganche con el puntaje
+## 5. Enganche con el puntaje
 
-- Timer al entrar; `mistakes` por cada clic en dispositivo legítimo.
-- Al terminar: `registrarIntento(nombre, "la_intrusa", mistakes, seconds)`.
-
-## 7. Pasos de implementación
-
-1. `init(seccion)` — render del diagrama del round; arranca timer/errores.
-2. Clic en dispositivo → comparar `intruso`; marcar.
-3. Avanzar rounds; al final, resultado + soluciones comentadas.
-4. `reset()` — limpiar al salir del reto.
+- Timer inicia al entrar; `mistakes` por cada clic en dispositivo legítimo.
+- Al terminar: `memory.registrarIntento(nombre, "la_intrusa", mistakes, seconds)`.
+- `reset()` limpia el DOM y reinicia timer/errores.

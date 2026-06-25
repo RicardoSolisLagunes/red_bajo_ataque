@@ -1,6 +1,6 @@
 # Reto: El cable perdido
 
-> Implementación objetivo: `js/challenges/cable_perdido.js`.
+> **Estado: ✅ Completado** — `js/challenges/cable_perdido.js`
 > Comparte motor de puntaje y timer (ver [`memory.md`](./memory.md), [`main.md`](./main.md)).
 
 ## 1. Objetivo de aprendizaje y temas
@@ -9,74 +9,69 @@ El jugador aprende a **identificar el cable/segmento defectuoso** dentro de dist
 **topologías** de red, reconociendo cómo el fallo se manifiesta según la topología.
 
 **Temas de redes cubiertos:**
-- Medios de transmisión: par trenzado (UTP/STP), coaxial, fibra óptica, inalámbrico.
-- Topologías: bus, estrella, anillo, malla.
+- Topologías: estrella, bus, anillo, malla.
 - Cómo un cable defectuoso afecta a cada topología (alcance del fallo).
+- Enrutamiento alternativo (anillo y malla): la red sigue funcionando por otra ruta.
 
-## 2. Investigación técnica (lo que enseña el reto)
+## 2. Mecánica implementada
 
-- **Topología en estrella:** todos los nodos van a un switch central. Si falla **un**
-  cable, **solo ese nodo** pierde conexión → el cable defectuoso es el del único host
-  caído. Pista visual: un nodo sin conexión, el resto OK.
-- **Topología en bus:** todos comparten un único medio (coaxial con terminadores). Una
-  ruptura del bus puede tumbar **todo el segmento**; el defecto está en el tramo troncal,
-  no en una bajada de nodo.
-- **Topología en anillo:** los datos circulan nodo a nodo; un corte interrumpe el anillo
-  (en anillo simple cae toda la red; pista: el corte está entre dos nodos del anillo).
-- **Topología en malla:** redundancia; si un enlace cae, hay rutas alternas. El defecto
-  es el enlace por el que ya no pasa tráfico aunque la red siga operando.
-- **Medios:** la fibra no sufre EMI (interferencia electromagnética); el UTP sí; el
-  coaxial es típico del bus clásico. Estos hechos refuerzan la solución comentada.
+El reto tiene **4 rounds** (uno por topología), jugados en orden. El cable roto
+**cambia en cada ejecución** (se elige al azar en `init()`).
 
-## 3. Mecánica de juego
+| Topología | Mecánica |
+|-----------|----------|
+| **Estrella** | Un PC muestra "sin red". El jugador hace clic en el cable roto. |
+| **Bus** | Un segmento del bus está roto; los PCs a la derecha quedan sin red. El jugador hace clic en el segmento roto. |
+| **Anillo** | El jugador elige PC origen y PC destino; se anima un paquete via BFS por la ruta alternativa. Luego hace clic en el enlace roto. |
+| **Malla** | Igual que anillo: paquete animado via BFS por ruta alternativa, luego clic en el enlace roto. |
 
-- Se presentan varios **rounds** (p. ej. 4), cada uno con un **diagrama de topología**.
-- Uno o más nodos/enlaces muestran síntoma de fallo (ícono de "sin conexión").
-- El jugador **hace clic en el cable/segmento** que cree defectuoso.
-- **Acierto:** avanza al siguiente round. **Error:** suma 1 a errores, el cable se marca
-  como incorrecto y puede reintentar el mismo round.
-- **Condición de victoria:** resolver todos los rounds. Al terminar se muestra la
-  **solución comentada** de cada uno y el puntaje (motor compartido con
-  `mistakes` total y `seconds` total).
+**Flujo de anillo/malla:**
+1. Instrucción de modo paquete mostrada (`packet-hint`).
+2. Clic en PC origen → se resalta.
+3. Clic en PC destino → BFS calcula ruta sobre el grafo de enlaces activos → círculo SVG
+   animado recorre los segmentos a 420 ms/segmento via `requestAnimationFrame`.
+4. Al terminar la animación, el jugador hace clic en el enlace roto.
 
-## 4. Modelo de datos (data-driven)
+## 3. Modelo de datos implementado
+
+Patrón **TEMPLATES → `_makeRound(tmpl)`**: los templates son fijos; `_makeRound` elige
+el cable roto al azar y genera `enunciado` y `solucion` dinámicamente.
 
 ```js
-const CABLE_PERDIDO_ROUNDS = [
-  {
-    id: "estrella-1",
-    topologia: "estrella",
-    enunciado: "Un solo equipo perdió conexión. ¿Qué cable está dañado?",
-    asset: "src/topologia_estrella.svg",          // placeholder
-    cables: [
-      { id: "c1", desde: "switch", hasta: "PC1", defectuoso: false },
-      { id: "c2", desde: "switch", hasta: "PC2", defectuoso: true  },
-      { id: "c3", desde: "switch", hasta: "PC3", defectuoso: false }
-    ],
-    solucion: "En estrella cada host tiene su propio cable al switch. Como solo PC2 " +
-              "quedó sin red, el cable defectuoso es el de PC2; los demás siguen OK."
-  },
-  // ... rounds para bus, anillo, malla
+const TEMPLATES = [
+  { id: 'estrella', tipo: 'estrella', pcs: ['PC1','PC2','PC3','PC4'] },
+  { id: 'bus', tipo: 'bus',
+    segments: [{id:'s1',li:0,ri:1},{id:'s2',li:1,ri:2},{id:'s3',li:2,ri:3}] },
+  { id: 'anillo', tipo: 'anillo',
+    nodes: ['PC1','PC2','PC3','PC4'],
+    allLinks: [{id:'l1',a:'PC1',b:'PC2'},{id:'l2',a:'PC2',b:'PC3'},
+               {id:'l3',a:'PC3',b:'PC4'},{id:'l4',a:'PC4',b:'PC1'}] },
+  { id: 'malla', tipo: 'malla',
+    nodes: ['PC1','PC2','PC3','PC4'],
+    allLinks: [ /* K4: 6 enlaces */ ] }
 ];
+
+// En init():
+const rounds = TEMPLATES.map(_makeRound);
 ```
 
-> El contenido vive en este array para agregar/editar rounds sin tocar la lógica.
+`_makeRound(tmpl)` retorna `{ ...tmpl, brokenId, enunciado, solucion, links? }`.
 
-## 5. Assets requeridos (`/src`, placeholders)
+**Bus**: `offlineLiThreshold = seg.li` → PCs en índice `> li` quedan offline.
+**Anillo/Malla**: `_buildGraph(links)` construye lista de adyacencia solo con enlaces
+`broken:false`; `_bfs(graph, start, end)` retorna el path de nodos.
 
-- `topologia_estrella.svg`, `topologia_bus.svg`, `topologia_anillo.svg`,
-  `topologia_malla.svg`.
-- Íconos: `pc.svg`, `switch.svg`, `cable_ok.svg`, `cable_falla.svg`, `nodo_sin_red.svg`.
-- Cada cable es un elemento clicable (`<line>`/`<path>` SVG o zona con `data-id`).
+## 4. SVG
 
-## 6. Enganche con el puntaje
+Generado **100% inline** en JS (sin archivos en `/src/`):
+- `_svgEstrella(r)`, `_svgBus(r)` — renderizan el diagrama completo.
+- Cada cable tiene dos elementos: `data-role="vis"` (línea visible) y
+  `data-role="hit"` (línea transparente ancha, clicable).
+- El highlighting en hover se aplica via JS (`mouseenter`/`mouseleave`) porque
+  los selectores CSS `~` no funcionan entre hermanos SVG en diferente orden.
 
-- Inicia timer al entrar al reto; acumula `mistakes` por cada clic incorrecto.
-- Al terminar: `registrarIntento(nombre, "cable_perdido", mistakes, seconds)`.
+## 5. Enganche con el puntaje
 
-## 7. Pasos de implementación
-
-1. `init(seccion)` — render del primer round; arranca timer y contador de errores.
-2. Manejar clic en cable → comparar `defectuoso`; marcar OK/error.
-3. Avanzar rounds; al final mostrar bloque de resultado + soluciones comentadas.
-4. `reset()` — limpiar al salir del reto (requisito de pérdida de progreso).
+- Timer inicia al entrar al reto; `mistakes` por cada clic incorrecto.
+- Al terminar: `memory.registrarIntento(nombre, "cable_perdido", mistakes, seconds)`.
+- `reset()` cancela la animación en curso (`cancelAnimationFrame`) y limpia el DOM.

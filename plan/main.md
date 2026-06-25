@@ -101,15 +101,15 @@ red_bajo_ataque/
 
 ## 6. Lista de hitos (checklist de implementación futura)
 
-- [ ] **M1 — Shell:** `index.html` + tabs + router + modal de nombre (ui_ux.md).
-- [ ] **M2 — Memoria/Puntaje:** `memory.js` (carga semilla, localStorage, motor de
+- [x] **M1 — Shell:** `index.html` + tabs + router + modal de nombre (ui_ux.md).
+- [x] **M2 — Memoria/Puntaje:** `memory.js` (carga semilla, localStorage, motor de
       puntaje, upsert de scoreboard) + `timer.js`.
-- [ ] **M3 — Reto 1:** El cable perdido.
-- [ ] **M4 — Reto 2:** La intrusa.
-- [ ] **M5 — Reto 3:** Identifica la red.
-- [ ] **M6 — Reto 4:** Anti-phishing.
-- [ ] **M7 — Scoreboard + Export:** tabla ordenada por Score y botón Exportar.
-- [ ] **M8 — Pulido:** integrar assets de `/src`, estilos, accesibilidad básica.
+- [x] **M3 — Reto 1:** El cable perdido (estrella, bus, anillo, malla + animación BFS).
+- [x] **M4 — Reto 2:** La intrusa.
+- [x] **M5 — Reto 3:** Identifica la red.
+- [x] **M6 — Reto 4:** Anti-phishing.
+- [x] **M7 — Scoreboard:** tabla ordenada por Score. Exportar reemplazado por persistencia via server.js.
+- [x] **M8 — Pulido:** SVG inline en challenges, iconos `/src` para anti-phishing, tema oscuro completo.
 
 ## 7. Mapa de contenidos (tema de redes por reto)
 
@@ -126,11 +126,11 @@ Tareas abiertas antes y durante la construcción del juego.
 
 | # | Pendiente | Estado | Notas |
 |---|-----------|--------|-------|
-| P1 | **Poblar `/src/`** con los SVG de la lista de abajo. | ⏳ pendiente | Bloquea el pulido visual (M8); los retos pueden construirse con placeholders. |
-| P2 | Integrar los assets reales en cada reto (reemplazar placeholders). | ⏳ pendiente | Depende de P1. |
-| P3 | Construir el juego (shell + memory + 4 retos + scoreboard). | ⏳ pendiente | Ver hitos M1–M8. |
-| P4 | **Poblar `memory/emails.txt`** con los correos del reto Anti-phishing (JSON). | ⏳ pendiente | Fuente de datos del reto; ver `anti_phishing_challenge.md`. |
-| P5 | Entregables no-juego (manual del facilitador, video, PDF, métricas). | ⏳ pendiente | Fuera del alcance del código. |
+| P1 | **Recursos SVG para los retos.** | ✅ resuelto | Las topologías y dispositivos se generan como SVG inline en JS. Los iconos de anti-phishing (`correo`, `anzuelo`, etc.) están en `/src/`. |
+| P2 | Integrar los assets en cada reto. | ✅ resuelto | SVG inline en `cable_perdido.js`; iconos `/src` cargados en `anti_phishing.js`. |
+| P3 | Construir el juego (shell + memory + 4 retos + scoreboard). | ✅ completado | Ver hitos M1–M8. |
+| P4 | **Poblar `memory/emails.txt`** con los correos del reto Anti-phishing (JSON). | ✅ completado | 14 correos (7 phishing + 7 legítimos). |
+| P5 | Entregables no-juego (manual del facilitador, video, PDF, métricas). | 🔶 parcial | Manual del facilitador y especificación técnica integrados en la página (tab Docs). Pendiente: video de presentación, PDF, métricas de sesión de prueba. |
 
 ### 8.1 Recursos `/src/` requeridos
 

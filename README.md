@@ -12,8 +12,7 @@ Abrir `index.html` en cualquier navegador moderno (Chrome 90+, Firefox 88+, Edge
 |---|--------|------|
 | 1 | **El cable perdido** | Topologías (estrella, bus, anillo, malla) y diagnóstico de fallos de cableado. Incluye animación de paquetes BFS en anillo y malla. |
 | 2 | **La intrusa** | Identificar el dispositivo no autorizado (Rogue AP, bypass de firewall) en un diagrama de red. |
-| 3 | **Identifica la red** | Clasificar una red por alcance (PAN/LAN/WLAN/MAN/WAN) y topología a partir de sus componentes. |
-| 4 | **Anti-phishing** | Distinguir correos legítimos de phishing usando indicadores técnicos y de contenido. Banco de 14 correos con selección aleatoria. |
+| 3 | **Anti-phishing** | Distinguir correos legítimos de phishing usando indicadores técnicos y de contenido. Se muestra un correo a la vez con avance automático al acertar. Banco de 14 correos con selección aleatoria de 5. |
 
 ## Puntuación
 
@@ -21,7 +20,7 @@ Abrir `index.html` en cualquier navegador moderno (Chrome 90+, Firefox 88+, Edge
 - **−20** por cada respuesta incorrecta.
 - Tiempo: los primeros 25 s son gratuitos; luego **−10 pts** cada 10 s adicionales (tope −50).
 - Mínimo 0 pts. El sistema guarda únicamente el **mejor intento** por reto.
-- Total máximo: 400 pts (4 retos × 100).
+- Total máximo: 300 pts (3 retos × 100).
 
 ## Estructura de archivos
 
@@ -36,8 +35,7 @@ red_bajo_ataque/
 │   └── challenges/
 │       ├── cable_perdido.js    # Reto 1 (SVG inline + BFS)
 │       ├── la_intrusa.js       # Reto 2
-│       ├── identifica_red.js   # Reto 3
-│       └── anti_phishing.js    # Reto 4
+│       └── anti_phishing.js    # Reto 3 (un correo a la vez, banco de 14)
 ├── src/                        # Iconos SVG para anti-phishing
 ├── memory/
 │   ├── scoreboard.txt          # JSON del scoreboard

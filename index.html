@@ -33,8 +33,7 @@
     <button class="tab active" data-target="#sec-inicio">Inicio</button>
     <button class="tab" data-target="#sec-cable-perdido"  data-challenge="cable_perdido">El cable perdido<span class="check-mark"></span></button>
     <button class="tab" data-target="#sec-la-intrusa"     data-challenge="la_intrusa">La intrusa<span class="check-mark"></span></button>
-    <button class="tab" data-target="#sec-identifica-red" data-challenge="identifica_red">Identifica la red<span class="check-mark"></span></button>
-    <button class="tab" data-target="#sec-anti-phishing"  data-challenge="anti_phishing">Anti-phishing<span class="check-mark"></span></button>
+<button class="tab" data-target="#sec-anti-phishing"  data-challenge="anti_phishing">Anti-phishing<span class="check-mark"></span></button>
     <button class="tab" data-target="#sec-scoreboard">Scoreboard</button>
   </nav>
 
@@ -45,27 +44,22 @@
       <h1>Bienvenido a <span class="highlight">Red Bajo Ataque</span></h1>
       <p class="intro-text">
         Un videojuego educativo sobre redes y ciberseguridad.
-        Supera los cuatro retos para aprender sobre topologías, dispositivos y ataques de ingeniería social.
+        Supera los tres retos para aprender sobre topologías, dispositivos y ataques de ingeniería social.
       </p>
       <div class="challenge-cards">
-        <div class="card" id="card-cable">
+        <div class="card" id="card-cable" data-challenge="cable_perdido">
           <div class="card-icon">🔌</div>
-          <h3>El cable perdido</h3>
+          <h3>El cable perdido<span class="check-mark"></span></h3>
           <p>Identifica el cable defectuoso en distintas topologías: estrella, bus, anillo y malla.</p>
         </div>
-        <div class="card" id="card-intrusa">
+        <div class="card" id="card-intrusa" data-challenge="la_intrusa">
           <div class="card-icon">🔍</div>
-          <h3>La intrusa</h3>
+          <h3>La intrusa<span class="check-mark"></span></h3>
           <p>Detecta el dispositivo no autorizado o malicioso conectado a la red.</p>
         </div>
-        <div class="card" id="card-identifica">
-          <div class="card-icon">🌐</div>
-          <h3>Identifica la red</h3>
-          <p>Clasifica el tipo de red (PAN/LAN/MAN/WAN/WLAN) y su topología a partir de los componentes.</p>
-        </div>
-        <div class="card" id="card-phishing">
+        <div class="card" id="card-phishing" data-challenge="anti_phishing">
           <div class="card-icon">🎣</div>
-          <h3>Anti-phishing</h3>
+          <h3>Anti-phishing<span class="check-mark"></span></h3>
           <p>Detecta los correos de phishing en tu bandeja de entrada identificando sus indicadores.</p>
         </div>
       </div>
@@ -77,10 +71,7 @@
     <!-- Reto 2 — La intrusa -->
     <section id="sec-la-intrusa" class="hidden"></section>
 
-    <!-- Reto 3 — Identifica la red -->
-    <section id="sec-identifica-red" class="hidden"></section>
-
-    <!-- Reto 4 — Anti-phishing -->
+<!-- Reto 4 — Anti-phishing -->
     <section id="sec-anti-phishing" class="hidden"></section>
 
     <!-- Scoreboard -->
@@ -235,41 +226,7 @@
             </div>
 
             <div class="challenge-brief">
-              <h4>🌐 Reto 3 — Identifica la red (Tipos de red)</h4>
-              <div class="cb-row">
-                <div class="cb-block">
-                  <div class="cb-label">Objetivo de aprendizaje</div>
-                  <p>Clasificar correctamente una red por su alcance geográfico (PAN / LAN / WLAN / MAN / WAN) y su topología física (estrella, bus, anillo, malla) a partir de los componentes y descripciones presentados.</p>
-                </div>
-                <div class="cb-block">
-                  <div class="cb-label">Conceptos clave</div>
-                  <ul>
-                    <li><strong>PAN:</strong> área personal, &lt;10 m, Bluetooth / Zigbee</li>
-                    <li><strong>LAN:</strong> red local, &lt;1 km, Ethernet</li>
-                    <li><strong>WLAN:</strong> LAN inalámbrica, misma escala que LAN pero sin cable</li>
-                    <li><strong>MAN:</strong> red metropolitana, ciudad/campus multi-edificio</li>
-                    <li><strong>WAN:</strong> red amplia, global, Internet</li>
-                  </ul>
-                </div>
-              </div>
-              <div class="cb-row" style="margin-top:12px">
-                <div class="cb-block">
-                  <div class="cb-label">Preguntas de discusión</div>
-                  <ol>
-                    <li>¿Cuál es la diferencia práctica entre una LAN y una WLAN? ¿Pueden coexistir?</li>
-                    <li>¿Una red de oficina con puntos de acceso Wi-Fi es LAN, WLAN o ambas?</li>
-                    <li>¿Qué tecnología conecta los diferentes edificios de una universidad en una MAN?</li>
-                  </ol>
-                </div>
-                <div class="cb-block">
-                  <div class="cb-label">Error común a señalar</div>
-                  <div class="callout warn"><strong>WLAN ≠ WAN:</strong> La "W" de ambas confunde a muchos. WLAN es una LAN inalámbrica (escala local); WAN es una red de área amplia (escala geográfica). El medio de transmisión (cable vs. radio) no determina la escala.</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="challenge-brief">
-              <h4>🎣 Reto 4 — Anti-phishing (Ingeniería social por correo)</h4>
+              <h4>🎣 Reto 3 — Anti-phishing (Ingeniería social por correo)</h4>
               <div class="cb-row">
                 <div class="cb-block">
                   <div class="cb-label">Objetivo de aprendizaje</div>
@@ -685,15 +642,14 @@
   </main>
 
   <footer>
-    <p>Curso de Redes &middot; Red Bajo Ataque</p>
+    <p>Fundamentos de redes de comunicaciones &middot; Red Bajo Ataque &middot; Ricardo Solís Lagunes</p>
   </footer>
 
   <script src="js/timer.js"></script>
   <script src="js/memory.js"></script>
   <script src="js/challenges/cable_perdido.js"></script>
   <script src="js/challenges/la_intrusa.js"></script>
-  <script src="js/challenges/identifica_red.js"></script>
-  <script src="js/challenges/anti_phishing.js"></script>
+<script src="js/challenges/anti_phishing.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -133,6 +133,7 @@ const antiPhishing = (() => {
   let _sec = null;
   let _banco = [];
   let _seleccion = [];
+  let _current = 0;
   // Per-email state: { selected: 'phishing'|'legit'|null, penalized: bool }
   let _estado = {};
   let _mistakes = 0;
@@ -172,21 +173,29 @@ const antiPhishing = (() => {
           <span>✗ Errores: <span class="err-cnt">0</span></span>
         </div>
       </div>
-      <p class="ch-desc">Revisa cada correo y clasifícalo. Cuando hayas clasificado los 5, pulsa <strong>Finalizar</strong>.</p>
-      <div id="ap-bandeja" class="bandeja"></div>
-      <div class="ch-actions">
-        <button id="ap-finalizar" class="btn-primary" disabled>Finalizar</button>
+      <p class="ch-desc">Revisa cada correo y clasifícalo usando los botones.</p>
+      <div id="ap-email-container"></div>
+      <div class="ap-classify-btns">
+        <button id="ap-btn-phishing" class="btn-phishing">
+          <img src="src/anzuelo.svg" class="icon-xs" alt="" onerror="this.style.display='none'">
+          🎣 Phishing
+        </button>
+        <button id="ap-btn-legit" class="btn-legit">
+          <img src="src/correo_seguro.svg" class="icon-xs" alt="" onerror="this.style.display='none'">
+          ✓ Legítimo
+        </button>
       </div>
+      <div id="ap-feedback" class="email-feedback hidden"></div>
       <div id="ap-result" class="result-block hidden"></div>
     `;
   }
 
-  function _renderBandeja() {
-    const bandeja = _sec.querySelector('#ap-bandeja');
-    bandeja.innerHTML = _seleccion.map((c, i) => `
-      <div class="email-card" id="ec-${c.id}" data-email-id="${c.id}">
+  function _renderEmail(index) {
+    const c = _seleccion[index];
+    _sec.querySelector('#ap-email-container').innerHTML = `
+      <div class="email-card" id="ec-${c.id}">
         <div class="email-hdr">
-          <span class="email-num">${i + 1}</span>
+          <span class="email-num">${index + 1}</span>
           <div class="email-meta">
             <div class="email-from">
               <img src="src/correo.svg" class="icon-sm" alt="" onerror="this.style.display='none'">
@@ -196,56 +205,66 @@ const antiPhishing = (() => {
           </div>
         </div>
         <div class="email-body">${c.cuerpo}</div>
-        <div class="email-btns">
-          <button class="btn-phishing" data-eid="${c.id}">
-            <img src="src/anzuelo.svg" class="icon-xs" alt="" onerror="this.style.display='none'">
-            🎣 Phishing
-          </button>
-          <button class="btn-legit" data-eid="${c.id}">
-            <img src="src/correo_seguro.svg" class="icon-xs" alt="" onerror="this.style.display='none'">
-            ✓ Legítimo
-          </button>
-        </div>
-        <div class="email-feedback hidden" id="ef-${c.id}"></div>
       </div>
-    `).join('');
+    `;
 
-    bandeja.querySelectorAll('.btn-phishing').forEach(b =>
-      b.addEventListener('click', () => _clasificar(b.dataset.eid, true)));
-    bandeja.querySelectorAll('.btn-legit').forEach(b =>
-      b.addEventListener('click', () => _clasificar(b.dataset.eid, false)));
+    const btnP = _sec.querySelector('#ap-btn-phishing');
+    const btnL = _sec.querySelector('#ap-btn-legit');
+    btnP.classList.remove('btn-sel');
+    btnL.classList.remove('btn-sel');
+    btnP.disabled = false;
+    btnL.disabled = false;
+
+    const fb = _sec.querySelector('#ap-feedback');
+    fb.classList.add('hidden');
+    fb.innerHTML = '';
   }
 
-  function _clasificar(emailId, markAsPhishing) {
+  function _clasificar(markAsPhishing) {
     if (_done) return;
-    const correo = _seleccion.find(c => c.id === emailId);
-    const st = _estado[emailId];
-    const correct = markAsPhishing === correo.esPhishing;
+    const c = _seleccion[_current];
+    const st = _estado[c.id];
+    if (st.selected !== null) return;
 
-    // Count mistake only on first wrong selection for this email
+    const correct = markAsPhishing === c.esPhishing;
+
     if (!correct && !st.penalized) {
       _mistakes++;
       st.penalized = true;
       _sec.querySelector('.err-cnt').textContent = _mistakes;
     }
 
-    st.selected = markAsPhishing ? 'phishing' : 'legit';
+    const btnP = _sec.querySelector('#ap-btn-phishing');
+    const btnL = _sec.querySelector('#ap-btn-legit');
+    btnP.classList.remove('btn-sel');
+    btnL.classList.remove('btn-sel');
+    (markAsPhishing ? btnP : btnL).classList.add('btn-sel');
 
-    const card = _sec.querySelector(`#ec-${emailId}`);
+    const card = _sec.querySelector(`#ec-${c.id}`);
     card.classList.remove('ec-correct', 'ec-wrong');
     card.classList.add(correct ? 'ec-correct' : 'ec-wrong');
 
-    card.querySelectorAll('.btn-phishing, .btn-legit').forEach(b => b.classList.remove('btn-sel'));
-    card.querySelector(markAsPhishing ? '.btn-phishing' : '.btn-legit').classList.add('btn-sel');
-
-    const fb = card.querySelector(`#ef-${emailId}`);
+    const fb = _sec.querySelector('#ap-feedback');
     fb.classList.remove('hidden');
-    fb.innerHTML = correct
-      ? `<span class="fb-ok">✓ Respuesta correcta</span>`
-      : `<span class="fb-err">✗ Incorrecto — intenta con la otra opción</span>`;
 
-    const allDone = _seleccion.every(c => _estado[c.id].selected !== null);
-    _sec.querySelector('#ap-finalizar').disabled = !allDone;
+    if (correct) {
+      st.selected = markAsPhishing ? 'phishing' : 'legit';
+      btnP.disabled = true;
+      btnL.disabled = true;
+      fb.innerHTML = `<span class="fb-ok">✓ Correcto</span>`;
+
+      const isLast = _current === _seleccion.length - 1;
+      setTimeout(() => {
+        if (isLast) {
+          _finalizar();
+        } else {
+          _current++;
+          _renderEmail(_current);
+        }
+      }, 1000);
+    } else {
+      fb.innerHTML = `<span class="fb-err">✗ Incorrecto — ${c.solucion}</span>`;
+    }
   }
 
   function _finalizar() {
@@ -255,47 +274,42 @@ const antiPhishing = (() => {
     const nombre = memory.getNombreActual();
     const score = memory.registrarIntento(nombre, 'anti_phishing', _mistakes, secs);
 
+    _sec.querySelector('#ap-email-container').style.display = 'none';
+    _sec.querySelector('.ap-classify-btns').style.display = 'none';
+    _sec.querySelector('#ap-feedback').style.display = 'none';
+
     const result = _sec.querySelector('#ap-result');
     result.classList.remove('hidden');
-
-    const correctas = _seleccion.filter(c => {
-      const resp = _estado[c.id].selected;
-      return (resp === 'phishing') === c.esPhishing;
-    }).length;
 
     result.innerHTML = `
       <div class="result-summary">
         <h3>🏁 Resultado</h3>
         <div class="result-stats">
           <span class="stat-box">Puntaje<br><strong>${score}</strong></span>
-          <span class="stat-box">Correctas<br><strong>${correctas}/5</strong></span>
+          <span class="stat-box">Correctas<br><strong>${_seleccion.length}/${_seleccion.length}</strong></span>
           <span class="stat-box">Errores<br><strong>${_mistakes}</strong></span>
           <span class="stat-box">Tiempo<br><strong>${secs}s</strong></span>
         </div>
       </div>
       <h4>Soluciones comentadas</h4>
-      ${_seleccion.map(c => {
-        const resp = _estado[c.id].selected;
-        const acierto = (resp === 'phishing') === c.esPhishing;
-        return `
-          <div class="sol-item ${acierto ? 'sol-ok' : 'sol-err'}">
-            <div class="sol-hdr">
-              <img src="${c.esPhishing ? 'src/correo_phishing.svg' : 'src/correo_seguro.svg'}"
-                   class="icon-sm" alt="" onerror="this.style.display='none'">
-              <span>${acierto ? '✅' : '❌'}</span>
-              <strong>${c.asunto}</strong>
-              <span class="sol-label ${c.esPhishing ? 'label-phish' : 'label-legit'}">
-                ${c.esPhishing ? '🎣 Phishing' : '✓ Legítimo'}
-              </span>
-            </div>
-            <p class="sol-texto">${c.solucion}</p>
-            <p class="sol-ind">
-              <img src="src/alerta.svg" class="icon-xs" alt="" onerror="this.style.display='none'">
-              <strong>Indicadores:</strong> ${c.indicadores.join(' · ')}
-            </p>
+      ${_seleccion.map(c => `
+        <div class="sol-item ${_estado[c.id].penalized ? 'sol-err' : 'sol-ok'}">
+          <div class="sol-hdr">
+            <img src="${c.esPhishing ? 'src/correo_phishing.svg' : 'src/correo_seguro.svg'}"
+                 class="icon-sm" alt="" onerror="this.style.display='none'">
+            <span>${_estado[c.id].penalized ? '❌' : '✅'}</span>
+            <strong>${c.asunto}</strong>
+            <span class="sol-label ${c.esPhishing ? 'label-phish' : 'label-legit'}">
+              ${c.esPhishing ? '🎣 Phishing' : '✓ Legítimo'}
+            </span>
           </div>
-        `;
-      }).join('')}
+          <p class="sol-texto">${c.solucion}</p>
+          <p class="sol-ind">
+            <img src="src/alerta.svg" class="icon-xs" alt="" onerror="this.style.display='none'">
+            <strong>Indicadores:</strong> ${c.indicadores.join(' · ')}
+          </p>
+        </div>
+      `).join('')}
       <div class="result-actions">
         <button class="btn-primary" id="ap-retry">Reintentar</button>
         <button class="btn-secondary" id="ap-inicio">Volver al Inicio</button>
@@ -315,6 +329,7 @@ const antiPhishing = (() => {
     _done = false;
     _estado = {};
     _seleccion = [];
+    _current = 0;
 
     _sec.innerHTML = _renderShell();
 
@@ -322,9 +337,10 @@ const antiPhishing = (() => {
     _seleccion = _seleccionar(_banco);
     _seleccion.forEach(c => { _estado[c.id] = { selected: null, penalized: false }; });
 
-    _renderBandeja();
+    _renderEmail(0);
 
-    _sec.querySelector('#ap-finalizar').addEventListener('click', _finalizar);
+    _sec.querySelector('#ap-btn-phishing').addEventListener('click', () => _clasificar(true));
+    _sec.querySelector('#ap-btn-legit').addEventListener('click', () => _clasificar(false));
 
     timer.start(s => {
       const d = _sec.querySelector('.timer-disp');
@@ -338,6 +354,7 @@ const antiPhishing = (() => {
     _done = false;
     _estado = {};
     _seleccion = [];
+    _current = 0;
   }
 
   function reintentar() { reset(); init(_sec); }

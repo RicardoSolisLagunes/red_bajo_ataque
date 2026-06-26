@@ -2,8 +2,7 @@ const app = (() => {
   const _challenges = {
     cable_perdido:  cablePerdido,
     la_intrusa:     laIntrusa,
-    identifica_red: identificaRed,
-    anti_phishing:  antiPhishing
+anti_phishing:  antiPhishing
   };
   let _activeChallenge = null;
 
@@ -85,9 +84,9 @@ const app = (() => {
   // ---- Checkmarks on tabs ----
 
   function refrescarChecks() {
-    document.querySelectorAll('.tab[data-challenge]').forEach(tab => {
-      const key = tab.dataset.challenge;
-      const span = tab.querySelector('.check-mark');
+    document.querySelectorAll('[data-challenge]').forEach(el => {
+      const key = el.dataset.challenge;
+      const span = el.querySelector('.check-mark');
       if (span) span.textContent = memory.estaCompletado(key) ? ' ✓' : '';
     });
   }
@@ -151,8 +150,7 @@ const app = (() => {
     const map = {
       'card-cable':    '#sec-cable-perdido',
       'card-intrusa':  '#sec-la-intrusa',
-      'card-identifica': '#sec-identifica-red',
-      'card-phishing': '#sec-anti-phishing'
+'card-phishing': '#sec-anti-phishing'
     };
     Object.entries(map).forEach(([id, target]) => {
       const el = document.getElementById(id);

@@ -54,6 +54,6 @@ La página incluye una sección **Docs** (botón en el header) con:
 - [x] Juego completo listo para jugarse
 - [x] Manual del facilitador (integrado en la página)
 - [x] Especificación técnica de los temas (integrada en la página)
-- [ ] Presentación en video (máx. 15 min)
-- [ ] Métricas de sesión de prueba
-- [ ] Documento PDF con manual y objetivos
+- [x] Presentación en video (máx. 15 min)
+- [x] Métricas de sesión de prueba
+- [x] Documento PDF con manual y objetivos
